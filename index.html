@@ -116,7 +116,9 @@ textarea{border:1px solid var(--line);background:var(--card);border-radius:var(-
 .btn.sm{padding:5px 10px;font-size:12.5px}
 .chipbtn{border:1px solid var(--line);border-radius:14px;padding:5px 12px;font-size:12.5px;background:var(--card)}
 .chipbtn.on{background:var(--ink);border-color:var(--ink);color:var(--card);font-weight:600}
-.sync{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+.sync{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2);white-space:nowrap;
+  padding:5px 9px;border-radius:14px}
+.sync:hover{background:var(--card-2)}
 .dot{width:8px;height:8px;border-radius:50%;background:#95a3b0;flex:none}
 .dot.on{background:#3fae72} .dot.off{background:#e0a13c}
 
@@ -391,13 +393,13 @@ body.nopin .burger{display:block}
       <button class="burger" id="btnBurger" aria-label="Menu"><svg class="ic lg" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <div class="etab"><b id="etabNom">Mon restaurant</b><span id="etabVille"></span></div>
       <div class="spacer"></div>
-      <div class="sync hide-m"><span class="dot" id="syncDot"></span><span id="syncTxt">Local</span></div>
+      <button class="sync hide-m" id="btnSync" title="Diagnostic de la connexion"><span class="dot" id="syncDot"></span><span id="syncTxt">Local</span></button>
       <button class="tico ring hide-m" id="btnExportTop" title="Exporter la vue"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4"/><path d="M5 19h14"/></svg></button>
       <button class="tico hide-m" id="btnModules" title="Modules"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
       <button class="tico" id="btnAlertes" title="Rappels"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-2 8-2 8h16s-2-1-2-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="badge" id="badgeAlertes" hidden>0</span></button>
       <button class="tico hide-m" id="btnAide" title="À propos"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".6" fill="currentColor"/></svg></button>
       <button class="tico" id="btnTheme" title="Thème sombre"><svg class="ic" viewBox="0 0 24 24"><path d="M20 14a8.5 8.5 0 0 1-10.5-11A8.5 8.5 0 1 0 20 14z"/></svg></button>
-      <button class="tico hide-m" id="btnParams" title="Établissement"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></button>
+      <button class="tico hide-m" id="btnParams" title="Établissement"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.2 14.6a1.5 1.5 0 0 0 .3 1.7l.1.1a1.9 1.9 0 1 1-2.6 2.6l-.1-.1a1.5 1.5 0 0 0-2.5 1v.2a1.9 1.9 0 1 1-3.8 0v-.1a1.5 1.5 0 0 0-2.5-1.1l-.1.1a1.9 1.9 0 1 1-2.6-2.6l.1-.1a1.5 1.5 0 0 0-1-2.5H4.4a1.9 1.9 0 1 1 0-3.8h.1a1.5 1.5 0 0 0 1.1-2.5l-.1-.1a1.9 1.9 0 1 1 2.6-2.6l.1.1a1.5 1.5 0 0 0 2.5-1V4.4a1.9 1.9 0 1 1 3.8 0v.1a1.5 1.5 0 0 0 2.5 1.1l.1-.1a1.9 1.9 0 1 1 2.6 2.6l-.1.1a1.5 1.5 0 0 0 1 2.5h.2a1.9 1.9 0 1 1 0 3.8h-.1a1.5 1.5 0 0 0-1.1.6z"/></svg></button>
       <button class="who" id="btnCompte">
         <b class="hide-m" id="whoNom">Utilisateur</b>
         <span class="av" id="whoAv">U</span>
@@ -495,7 +497,8 @@ body.nopin .burger{display:block}
    1. CONSTANTES
    ============================================================ */
 const LKEY = "silla-resto";
-const DEF_DB = "https://towerdefense-c303b-default-rtdb.firebaseio.com";
+const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
+const DB_OBSOLETE = "https://towerdefense-c303b-default-rtdb.firebaseio.com";
 const DEF_NODE = "planning";
 const JOURS = ["lun.","mar.","mer.","jeu.","ven.","sam.","dim."];
 const JOURS_L = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
@@ -667,6 +670,7 @@ const LS = {
   set:(k,v)=>{try{localStorage.setItem(LKEY+":"+k,JSON.stringify(v))}catch(e){}}
 };
 let dbUrl  = LS.get("db",  DEF_DB);
+if(dbUrl===DB_OBSOLETE){ dbUrl=DEF_DB; LS.set("db",dbUrl); }
 let dbNode = LS.get("node",DEF_NODE);
 let user   = LS.get("user",{nom:"Utilisateur",role:"Manager"});
 let favMenu= LS.get("favMenu",FAV_DEF);
@@ -686,6 +690,34 @@ function chargerMirroir(){
    4. FIREBASE
    ============================================================ */
 let FB=null, unsubSem=null, unsubReel=null;
+let enLigne=false, cacheIncomplet=false, diagFait=false;
+const REGIONS=["firebaseio.com","europe-west1.firebasedatabase.app","us-central1.firebasedatabase.app",
+               "asia-southeast1.firebasedatabase.app"];
+function candidats(){
+  const m=String(dbUrl).match(/^https:\/\/([^.]+)\./);
+  const noms=m?[m[1]]:[];
+  const urls=[dbUrl,...noms.flatMap(n=>REGIONS.map(r=>"https://"+n+"."+r))];
+  return [...new Set(urls.filter(Boolean))];
+}
+async function sonder(url){
+  try{
+    const c=new AbortController(); const t=setTimeout(()=>c.abort(),6000);
+    const r=await fetch(url+"/"+dbNode+".json?shallow=true",{signal:c.signal});
+    clearTimeout(t);
+    if(r.ok) return {url,ok:true,txt:"accessible"};
+    if(r.status===401||r.status===403) return {url,ok:false,txt:"adresse correcte, règles à publier"};
+    return {url,ok:false,txt:"erreur "+r.status};
+  }catch(e){ return {url,ok:false,txt:"injoignable"}; }
+}
+const sonderTout = () => Promise.all(candidats().map(sonder));
+async function diagnosticAuto(){
+  if(diagFait) return; diagFait=true;
+  const r=await sonderTout();
+  const bon=r.find(x=>x.ok&&x.url!==dbUrl);
+  const regles=r.find(x=>x.url===dbUrl&&x.txt.includes("règles"));
+  if(bon) toast("Une autre adresse répond : ouvrez l'indicateur de synchronisation");
+  else if(regles) toast("Adresse correcte mais règles Firebase non publiées pour « "+dbNode+" »");
+}
 const majSync=(cls,txt)=>{$("#syncDot").className="dot "+cls;$("#syncTxt").textContent=txt};
 const erreurEcriture=()=>toast("Écriture refusée par Firebase, vérifiez les règles");
 
@@ -698,7 +730,10 @@ async function initFirebase(){
       import("https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js")]);
     FB={db:D.getDatabase(A.initializeApp({databaseURL:dbUrl},"si"+Date.now())), ...D};
     FB.onValue(FB.ref(FB.db,".info/connected"),s=>{
-      const ok=!!s.val(); majSync(ok?"on":"off", ok?"Synchronisé":"Hors ligne");
+      const ok=!!s.val();
+      if(ok&&!enLigne){ ST.cache={}; cacheIncomplet=false; rendre(); }
+      enLigne=ok; majSync(ok?"on":"off", ok?"Synchronisé":"Hors ligne");
+      if(!ok) setTimeout(()=>{ if(!enLigne) diagnosticAuto(); },8000);
     });
     FB.onValue(FB.ref(FB.db,dbNode+"/config"),s=>{
       const v=s.val();
@@ -760,8 +795,11 @@ async function chargerSemaines(ids){
   if(!manquants.length) return;
   if(!FB){ manquants.forEach(i=>ST.cache[i]={}); return; }
   await Promise.all(manquants.map(async i=>{
-    try{ ST.cache[i]=(await FB.get(FB.ref(FB.db,dbNode+"/semaines/"+i))).val()||{}; }
-    catch(e){ ST.cache[i]={}; }
+    try{
+      const lu = FB.get(FB.ref(FB.db,dbNode+"/semaines/"+i)).then(x=>x.val()||{});
+      const v  = await Promise.race([lu, new Promise(r=>setTimeout(()=>r(null),7000))]);
+      if(v===null){ cacheIncomplet=true; ST.cache[i]={}; } else ST.cache[i]=v;
+    }catch(e){ cacheIncomplet=true; ST.cache[i]={}; }
   }));
 }
 function creneauDe(emp,date,part){
@@ -1407,7 +1445,8 @@ VUES.cumuls = async ()=>{
       <td class="num"><b>${fmt(d.tot)}</b></td><td class="num muted">${fmt(d.du)}</td>
       <td class="num" style="font-weight:700;color:${d.ec>0?"var(--rouge)":d.ec<0?"var(--bleu)":"var(--ink)"}">${d.ec>0?"+":""}${fmt(d.ec)}</td></tr>`).join("")
     : `<tr><td colspan="${ids.length+4}" class="muted" style="padding:20px">Aucun salarié.</td></tr>`;
-  page(wrapPad(h+`</tbody></table></div>
+  page(wrapPad((cacheIncomplet?`<p class="warnbox" style="margin:0 0 12px">Certaines semaines n'ont pas pu être lues sur la base. Les totaux ci-dessous sont incomplets. Vérifiez la connexion en cliquant sur l'indicateur en haut de l'écran.</p>`:"")
+    +h+`</tbody></table></div>
     <p class="muted" style="margin-top:10px;font-size:12px">Le cumul compare les heures planifiées à la durée contractuelle sur la période. Il ne tient pas compte des absences indemnisées.</p>`));
   $("#selNb").onchange=e=>{nbSemCumul=+e.target.value;rendre()};
   $("#btnCsvC").onclick=()=>csv([["Salarié","Poste","Contrat",...ids,"Réalisé","Contractuel","Cumul"],
@@ -1506,7 +1545,9 @@ VUES.etablissement = ()=>{
       <button class="btn" id="btnBackup">Télécharger une sauvegarde</button>
       <button class="btn" id="btnRestore">Restaurer un fichier</button>
       <input type="file" id="fileRestore" accept="application/json" hidden>
+      <button class="btn" id="btnTestCo">Tester la connexion</button>
     </div></div>`));
+  $("#btnTestCo").onclick=ouvrirDiagnostic;
   $("#btnSaveEtab").onclick=()=>{
     ST.cfg.resto={nom:$("#rNom").value.trim()||"Mon restaurant", ville:$("#rVille").value.trim(),
       adresse:$("#rAdr").value.trim(), lat:parseFloat($("#rLat").value)||null, lon:parseFloat($("#rLon").value)||null};
@@ -1905,6 +1946,30 @@ $("#infoClose").onclick=()=>$("#dlgInfo").close();
 /* ============================================================
    23. EN-TÊTE
    ============================================================ */
+async function ouvrirDiagnostic(){
+  infoDlg("Synchronisation",`<p class="muted" style="margin:0">Test des adresses en cours…</p>`);
+  const res=await sonderTout();
+  const lignes=res.map(r=>`<tr>
+    <td style="word-break:break-all;font-size:11.5px">${esc(r.url)}</td>
+    <td style="color:${r.ok?"var(--vert)":r.txt.includes("règles")?"var(--accent)":"var(--rouge)"}">${esc(r.txt)}</td>
+    <td>${r.url===dbUrl?'<span class="muted">actuelle</span>'
+        :r.ok?`<button class="btn sm" data-url="${esc(r.url)}">Utiliser</button>`:""}</td></tr>`).join("");
+  $("#infoBody").innerHTML=`
+    <p style="margin:0;line-height:1.7">
+      Bibliothèque Firebase : <b>${FB?"chargée":"non chargée"}</b><br>
+      Connexion temps réel : <b style="color:${enLigne?"var(--vert)":"var(--rouge)"}">${enLigne?"établie":"absente"}</b><br>
+      Nœud interrogé : <b>${esc(dbNode)}</b></p>
+    <div class="tbwrap"><table class="tb"><thead><tr><th>Adresse testée</th><th>Réponse</th><th></th></tr></thead>
+      <tbody>${lignes}</tbody></table></div>
+    <p class="warnbox" style="margin:0">« Adresse correcte, règles à publier » signifie que la base existe mais que le nœud
+      « ${esc(dbNode)} » n'est pas encore autorisé. Collez le fichier de règles dans la console Firebase puis publiez.
+      « Injoignable » sur toutes les lignes signifie que l'adresse ne correspond à aucune base, souvent une question de région.</p>`;
+  $$("#infoBody [data-url]").forEach(b=>b.onclick=()=>{
+    dbUrl=b.dataset.url; LS.set("db",dbUrl);
+    toast("Adresse enregistrée, rechargement"); setTimeout(()=>location.reload(),700);
+  });
+}
+$("#btnSync").onclick=ouvrirDiagnostic;
 $("#btnCompte").onclick=ouvrirCompte;
 $("#btnParams").onclick=()=>aller("etablissement");
 $("#btnModules").onclick=()=>infoDlg("Modules",

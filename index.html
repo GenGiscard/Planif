@@ -325,6 +325,9 @@ html[data-theme=sombre] .warnbox{background:#332a1c;border-color:#4d4028;color:#
   .burger{display:block}
   .topbar{gap:10px;padding:0 10px}
   .topbar .hide-m{display:none}
+  .sync{padding:6px;border-radius:50%}
+  #syncTxt{display:none}
+  .sync .dot{width:11px;height:11px}
   #viewbar{padding:8px 10px;gap:8px}
   .range{display:none}
   .pad{padding:12px}
@@ -377,6 +380,7 @@ body.nopin .burger{display:block}
           <rect x="24" y="30.4" width="7.5" height="2.8" rx="1.4" fill="#ffffff" fill-opacity=".4"/>
         </svg>
         <b>KIK<span>PLANIF'</span></b>
+        <em id="vTag" style="font-style:normal;font-size:9.5px;color:var(--ink-3);margin-left:6px;letter-spacing:0"></em>
       </div>
       <button class="pin on" id="btnPin" title="Épingler le menu"><svg class="ic sm" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 4 3v2H6v-2l4-3z"/><path d="M12 14v7"/></svg></button>
     </div>
@@ -393,7 +397,7 @@ body.nopin .burger{display:block}
       <button class="burger" id="btnBurger" aria-label="Menu"><svg class="ic lg" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <div class="etab"><b id="etabNom">Mon restaurant</b><span id="etabVille"></span></div>
       <div class="spacer"></div>
-      <button class="sync hide-m" id="btnSync" title="Diagnostic de la connexion"><span class="dot" id="syncDot"></span><span id="syncTxt">Local</span></button>
+      <button class="sync" id="btnSync" title="Diagnostic de la connexion"><span class="dot" id="syncDot"></span><span id="syncTxt">Local</span></button>
       <button class="tico ring hide-m" id="btnExportTop" title="Exporter la vue"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4"/><path d="M5 19h14"/></svg></button>
       <button class="tico hide-m" id="btnModules" title="Modules"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
       <button class="tico" id="btnAlertes" title="Rappels"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-2 8-2 8h16s-2-1-2-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="badge" id="badgeAlertes" hidden>0</span></button>
@@ -496,6 +500,7 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
+const VERSION = "v4 — 6 septembre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
 const DB_OBSOLETE = "https://towerdefense-c303b-default-rtdb.firebaseio.com";
@@ -1980,7 +1985,8 @@ async function ouvrirDiagnostic(){
     <p style="margin:0;line-height:1.7">
       Bibliothèque Firebase : <b>${FB?"chargée":"non chargée"}</b><br>
       Connexion temps réel : <b style="color:${enLigne?"var(--vert)":"var(--rouge)"}">${enLigne?"établie":"absente"}</b><br>
-      Nœud interrogé : <b>${esc(dbNode)}</b></p>
+      Nœud interrogé : <b>${esc(dbNode)}</b><br>
+      Version du fichier : <b>${VERSION}</b></p>
     <div class="tbwrap"><table class="tb"><thead><tr><th>Adresse testée</th><th>Réponse</th><th></th></tr></thead>
       <tbody>${lignes}</tbody></table></div>
     <p class="warnbox" style="margin:0">« Adresse correcte, règles à publier » signifie que la base existe mais que le nœud
@@ -2028,14 +2034,15 @@ $("#btnAide").onclick=()=>infoDlg("À propos",
   `<p style="margin:0;line-height:1.6"><b>Kik Planif'</b> — outil de gestion du personnel pour un restaurant : planification hebdomadaire,
    émargement, compteurs d'heures et préparation de la paye.</p>
    <p class="muted" style="margin:0;font-size:12px">Données synchronisées en temps réel via Firebase Realtime Database.
-   Nœud utilisé : <b>${esc(dbNode)}</b>.</p>`);
+   Nœud utilisé : <b>${esc(dbNode)}</b>.<br>Version du fichier : <b>${VERSION}</b>.</p>`);
 $("#btnExportTop").onclick=()=>{
   if(vue==="personnel"||vue==="repertoire"){const b=$("#btnCsvP");if(b)return b.click();}
   exportSemaine();
 };
 $("#btnTheme").onclick=()=>{
   theme = theme==="clair" ? "sombre" : "clair";
-  document.documentElement.dataset.theme=theme; LS.set("theme",theme);
+  document.documentElement.dataset.theme=theme;
+$("#vTag").textContent=VERSION.split(" ")[0]; LS.set("theme",theme);
   document.querySelector('meta[name=theme-color]').content = theme==="sombre"?"#1b2530":"#ffffff";
 };
 $("#btnPin").onclick=()=>{
@@ -2053,6 +2060,7 @@ document.addEventListener("keydown",e=>{
    24. DÉMARRAGE
    ============================================================ */
 document.documentElement.dataset.theme=theme;
+$("#vTag").textContent=VERSION.split(" ")[0];
 chargerMirroir();
 const dep=(location.hash||"").replace("#/","");
 if(dep&&(dep==="accueil"||TOUS.some(i=>i.id===dep))) vue=dep;

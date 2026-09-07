@@ -283,11 +283,13 @@ body.railover .rail h3 .close{display:block}
   overflow:hidden;white-space:nowrap;font-variant-numeric:tabular-nums}
 
 /* rail favoris */
-  .rail{width:186px;flex:none;border-left:1px solid var(--line);background:var(--paper);
+  .rail{width:158px;flex:none;border-left:1px solid var(--line);background:var(--paper);
   display:flex;flex-direction:column;overflow:hidden}
 .rail h3{margin:0;padding:10px 12px;font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--ink-2);
   border-bottom:1px solid var(--line);background:var(--card);display:flex;align-items:center}
-.rail h3 .close{display:none;margin-left:auto;color:var(--ink-2)}
+.rail h3 .pinr{margin-left:auto;color:var(--ink-3);padding:2px 4px}
+.rail h3 .pinr.on{color:var(--accent)}
+.rail h3 .close{display:none;margin-left:6px;color:var(--ink-2)}
 .railscroll{overflow:auto;padding:8px;flex:1}
 .armed{margin:0 0 8px;padding:8px 10px;background:var(--accent);color:#fff;border-radius:var(--r);
   font-size:11.5px;line-height:1.35;display:none}
@@ -526,7 +528,7 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
-const VERSION = "v10 — 7 septembre 2026";
+const VERSION = "v11 — 7 septembre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
 const DB_ANCIENNES = ["https://towerdefense-c303b-default-rtdb.firebaseio.com",
@@ -548,6 +550,8 @@ const TYPES = {
   FORM:{lab:"Formation",bg:"#a9cfc4",fg:"#1e4038",code:"FORM"}
 };
 const ABSENCES = ["RH","CP","RTT","MAL","AT","FORM"];
+const SEUIL_SOIR = 16*60+30;
+const partAttendue = debut => toMin(debut) >= SEUIL_SOIR ? "soir" : "midi";
 const BANDES = [
   {max:9*60+29,bg:"#bfe1f2"},{max:10*60+29,bg:"#a9e2ce"},{max:11*60+19,bg:"#bfe8dc"},
   {max:11*60+49,bg:"#e79087"},{max:12*60+30,bg:"#f2a4b8"},{max:17*60+29,bg:"#f6df94"},
@@ -561,7 +565,7 @@ const FAV_DEFAUT = [
   ["18:50","23:30",10],["18:50","00:00",10]
 ];
 const SERVICES_DEF = ["Responsable","Cuisine","Salle"];
-const POSTES_DEF = ["Directeur","Leader","Chef grilladin","Grilladin","Aide de cuisine","Serveur","Runner","Barman","Plongeur"];
+const POSTES_DEF = ["Directeur","Responsable","Chef grilladin","Grilladin","Aide de cuisine","Serveur","Runner","Barman","Plongeur"];
 const AV_COL = ["#3c6e8f","#7a5ba6","#b0563f","#2f7d64","#8a6a2f","#4a5f8f","#a04a72","#3f7a7a"];
 
 /* icônes */
@@ -676,27 +680,41 @@ let tt; function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("o
 const estMobile=()=>window.matchMedia("(max-width:1000px)").matches;
 function ajusterColonnes(){
   const R=document.documentElement.style, mob=estMobile();
-  const over = !mob && window.innerWidth<1500;
+  const over = !mob && (!railPin || window.innerWidth<1500);
   document.body.classList.toggle("railover",over);
   const fab=$("#fabFav");
   if(fab) fab.classList.toggle("on",(mob||over)&&(vue==="planning"||vue==="journalier"));
   if(mob){
     ["--colw","--namew","--countw"].forEach(v=>R.removeProperty(v));
     document.body.classList.remove("dense");
-    colSerre = (modeMobile==="semaine");
-    return;
+    colSerre=(modeMobile==="semaine"); return;
   }
-  const w=$("#page").clientWidth||window.innerWidth;
-  const railW = (!over && (vue==="planning"||vue==="journalier")) ? 186 : 0;
-  const nomW = w<1100?150:(w<1300?176:206);
-  const cntW = w<1100? 92:(w<1300?112:138);
+  const g=document.querySelector(".gridwrap");
+  const railW=(!over && !g && (vue==="planning"||vue==="journalier"))?158:0;
+  const w=((g?g.clientWidth:$("#page").clientWidth)||window.innerWidth)-railW;
+  const nomW = w<1080?148:(w<1280?174:204);
+  const cntW = w<1080? 90:(w<1280?110:136);
   const n=7*partsVis().length;
-  const col=Math.min(150,Math.max(56,Math.floor((w-railW-nomW-cntW-6)/n)));
+  const col=Math.min(150,Math.max(50,Math.floor((w-nomW-cntW-n-8)/n)));
   R.setProperty("--colw",col+"px");
   R.setProperty("--namew",nomW+"px");
   R.setProperty("--countw",cntW+"px");
   document.body.classList.toggle("dense",col<86);
-  colSerre = col<86;
+  colSerre=col<86;
+}
+/* deuxième passe : on rétrécit tant que le tableau dépasse réellement */
+let reajuste=false;
+function verifierLargeur(){
+  if(estMobile()||reajuste) return;
+  const g=document.querySelector(".gridwrap"), t=g&&g.querySelector("table.pl");
+  if(!g||!t) return;
+  const R=document.documentElement.style;
+  let col=parseInt(R.getPropertyValue("--colw"))||90, garde=0;
+  while(t.scrollWidth>g.clientWidth+1 && col>46 && garde++<20){
+    col-=3; R.setProperty("--colw",col+"px");
+  }
+  document.body.classList.toggle("dense",col<86);
+  if(colSerre!==(col<86)){ colSerre=col<86; reajuste=true; rendre().then(()=>reajuste=false); }
 }
 function dl(blob,nom){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=nom;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
 function csv(lignes,nom){
@@ -735,6 +753,7 @@ let user   = LS.get("user",{nom:"Utilisateur",role:"Manager"});
 let favMenu= LS.get("favMenu",FAV_DEF);
 let theme  = LS.get("theme","clair");
 modeMobile = LS.get("modeMobile","jour");
+let railPin = LS.get("railPin",true);
 
 function mirroir(){
   LS.set("mir",{cfg:ST.cfg,employes:ST.employes,replie:ST.replie,semId:semId(lundi),sem:ST.sem});
@@ -885,10 +904,26 @@ const lireReel=(e,d,p)=>(ST.reel&&ST.reel[e]&&ST.reel[e][d]&&ST.reel[e][d][p])||
 /* ============================================================
    5. SÉLECTEURS
    ============================================================ */
+const rangPoste = p => { const i=(ST.cfg.postes||[]).indexOf(p); return i<0?99:i; };
 const listeEmployes = () => Object.entries(ST.employes||{}).map(([id,e])=>({id,...e}))
-  .sort((a,b)=>(a.ordre??500)-(b.ordre??500)||String(a.nom||"").localeCompare(String(b.nom||""),"fr"));
+  .sort((a,b)=> rangPoste(a.poste)-rangPoste(b.poste)
+             || (a.ordre??500)-(b.ordre??500)
+             || String(a.nom||"").localeCompare(String(b.nom||""),"fr"));
 const emp = id => ST.employes[id]||{};
-const nomComplet = e => ((e.nom||"")+" "+(e.prenom||"")).trim()||"Salarié";
+let migrationFaite=false;
+function migrerPostes(){
+  if(migrationFaite) return;
+  let ch=false;
+  if((ST.cfg.postes||[]).includes("Leader")){
+    ST.cfg.postes=[...new Set(ST.cfg.postes.map(x=>x==="Leader"?"Responsable":x))];
+    ch=true;
+  }
+  for(const [id,e] of Object.entries(ST.employes||{})){
+    if(e.poste==="Leader"){ e.poste="Responsable"; ecrireEmploye(id,e); ch=true; }
+  }
+  if(ch){ migrationFaite=true; ecrireCfg(); }
+}
+const nomComplet = e => ((e.prenom||"")+" "+(e.nom||"")).trim()||"Salarié";
 const listeFavoris = () => Object.entries(ST.cfg.favoris||{}).map(([id,f])=>({id,...f}))
   .sort((a,b)=>toMin(a.debut)-toMin(b.debut)||toMin(a.fin)-toMin(b.fin));
 const jours = () => Array.from({length:7},(_,i)=>{const d=new Date(lundi);d.setDate(d.getDate()+i);return d});
@@ -1006,12 +1041,13 @@ function brancherBarre(){
 
 const VUES={};
 async function rendre(){
-  majEntete();
+  majEntete(); migrerPostes();
   document.body.classList.toggle("paint",!!arme);
   document.body.classList.toggle("vsem",modeMobile==="semaine");
   ajusterColonnes();
   const f=VUES[vue];
   if(f) await f(); else vueBientot();
+  ajusterColonnes(); verifierLargeur();
   brancherBarre();
 }
 
@@ -1820,7 +1856,9 @@ function vueBientot(){
    ============================================================ */
 function railHTML(){
   return `<aside class="rail" id="rail">
-    <h3>Créneaux favoris <button class="close" id="railClose">&#10005;</button></h3>
+    <h3>Créneaux <button class="pinr${railPin?" on":""}" id="railPin" title="Épingler le panneau">
+      <svg class="ic sm" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 4 3v2H6v-2l4-3z"/><path d="M12 14v7"/></svg></button>
+      <button class="close" id="railClose">&#10005;</button></h3>
     <div class="railscroll">
       <div class="armed${arme?" on":""}" id="armedBanner"><span id="armedText">${arme?texteArme():""}</span><br><button id="disarm">Arrêter</button></div>
       <div class="absrow" id="absRow">${absHTML()}</div>
@@ -1873,6 +1911,9 @@ function brancherRail(){
   const g=$("[data-gomme]",r); if(g) g.onclick=()=>armer(arme&&arme.kind==="gomme"?null:{kind:"gomme"});
   $("#disarm").onclick=()=>armer(null);
   $("#railClose").onclick=()=>r.classList.remove("open");
+  $("#railPin").onclick=()=>{
+    railPin=!railPin; LS.set("railPin",railPin); r.classList.remove("open"); rendre();
+  };
   $("#addFav").onclick=()=>{
     const d=$("#favStart").value,f=$("#favEnd").value,p=+$("#favPause").value||0;
     if(!d||!f) return toast("Renseignez une heure de début et de fin");
@@ -1906,7 +1947,7 @@ const caseDe = el => (el&&el.closest) ? el.closest("td.cell,.mcell") : null;
 $("#page").addEventListener("pointerdown",ev=>{
   const td=caseDe(ev.target); if(!td) return;
   if(!arme){ ouvrirCreneau(td); return; }
-  ev.preventDefault(); peint=true; dejaPeint.clear(); appliquer(td);
+  ev.preventDefault(); peint=true; alertePart=false; dejaPeint.clear(); appliquer(td);
 });
 document.addEventListener("pointermove",ev=>{
   if(!peint||!arme) return;
@@ -1916,9 +1957,15 @@ document.addEventListener("pointermove",ev=>{
 const finPeinture=()=>{ if(peint){peint=false;dejaPeint.clear();rendre();} };
 document.addEventListener("pointerup",finPeinture);
 document.addEventListener("pointercancel",finPeinture);
+let alertePart=false;
 function appliquer(td){
   const k=td.dataset.e+"|"+td.dataset.d+"|"+td.dataset.p;
   if(dejaPeint.has(k)) return;
+  if(arme.kind==="fav" && partAttendue(arme.debut)!==td.dataset.p){
+    if(!alertePart){ alertePart=true;
+      toast("Ce créneau démarre à "+arme.debut+", il relève du service du "+partAttendue(arme.debut)); }
+    return;
+  }
   dejaPeint.add(k);
   let val=null;
   if(arme.kind==="abs") val={type:arme.type};
@@ -1956,6 +2003,9 @@ function majDur(){$("#shDur").value=fmt(duree({type:"travail",debut:$("#shStart"
 ["#shStart","#shEnd","#shPause"].forEach(s=>$(s).addEventListener("input",majDur));
 $("#shSave").onclick=()=>{
   const t=typeChoisi(), note=$("#shNote").value.trim();
+  if(t==="travail" && partAttendue($("#shStart").value)!==cible.p)
+    return toast("Un créneau démarrant à "+$("#shStart").value+" relève du service du "
+                 +partAttendue($("#shStart").value)+", pas du "+cible.p);
   const v = t==="travail"
     ? {type:"travail",debut:$("#shStart").value,fin:$("#shEnd").value,pause:+$("#shPause").value||0,poste:$("#shPoste").value,note}
     : {type:t,note};
@@ -2122,7 +2172,7 @@ $("#btnPin").onclick=()=>{
 let tRedim;
 window.addEventListener("resize",()=>{
   clearTimeout(tRedim);
-  tRedim=setTimeout(ajusterColonnes,120);
+  tRedim=setTimeout(()=>{ajusterColonnes();verifierLargeur();},120);
   if(!estMobile()){ fermerMenu(); const r=$("#rail"); if(r)r.classList.remove("open"); }
 });
 document.addEventListener("keydown",e=>{

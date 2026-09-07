@@ -16,7 +16,7 @@
   --side:#ffffff; --side-txt:#3c4b5c; --side-hi:#f3f6f9;
   --r:6px; --safe-b:env(safe-area-inset-bottom,0px);
   --colw:106px; --namew:236px; --countw:150px;
-  --sidew:264px;
+  --sidew:238px;
 }
 html[data-theme=sombre]{
   --ink:#e6ecf2; --ink-2:#a8b6c4; --ink-3:#7d8d9c;
@@ -243,7 +243,25 @@ tr.grouptot td.count{background:var(--card-2)}
 .mcell .cell-empty{border-color:var(--line);background:var(--card)}
 .mini-cnt{display:block;font-size:10.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
 .mini-cnt b.over{color:var(--rouge)} .mini-cnt b.under{color:var(--bleu)}
-.jourbar{display:flex;gap:5px;overflow-x:auto;padding:2px 0}
+.mobonly{display:none}
+.jourbar{display:flex;gap:5px;overflow-x:auto;padding:2px 0;flex:1}
+body.dense .chip{padding:2px 4px}
+body.dense .chip .h{font-size:10.5px}
+body.dense .chip .p{font-size:9.5px}
+body.dense td.cell{height:42px}
+body.dense .pinfo b{font-size:12px}
+body.dense .pinfo>span{font-size:10.5px}
+body.dense .avatar{width:26px;height:26px;font-size:10px}
+body.dense .cnt{font-size:11px;gap:4px}
+body.dense th.part{font-size:11px}
+body.dense th.day{font-size:12px}
+body.dense td.name{padding:4px 8px 4px 10px}
+.fabfav.on{display:block}
+body.railover .rail{position:fixed;top:0;right:0;bottom:0;width:230px;z-index:70;
+  transform:translateX(101%);transition:transform .2s;border-left:1px solid var(--line-2);
+  box-shadow:-8px 0 26px rgba(12,22,32,.22)}
+body.railover .rail.open{transform:none}
+body.railover .rail h3 .close{display:block}
 .daybtn{flex:0 0 auto;min-width:52px;border:1px solid var(--line);border-radius:var(--r);padding:5px 7px;
   text-align:center;line-height:1.2;background:var(--card)}
 .daybtn b{display:block;font-size:12px;font-weight:650}
@@ -265,7 +283,7 @@ tr.grouptot td.count{background:var(--card-2)}
   overflow:hidden;white-space:nowrap;font-variant-numeric:tabular-nums}
 
 /* rail favoris */
-.rail{width:206px;flex:none;border-left:1px solid var(--line);background:var(--paper);
+  .rail{width:186px;flex:none;border-left:1px solid var(--line);background:var(--paper);
   display:flex;flex-direction:column;overflow:hidden}
 .rail h3{margin:0;padding:10px 12px;font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--ink-2);
   border-bottom:1px solid var(--line);background:var(--card);display:flex;align-items:center}
@@ -333,6 +351,14 @@ html[data-theme=sombre] .warnbox{background:#332a1c;border-color:#4d4028;color:#
   .pad{padding:12px}
   table.pl{display:none}
   .mday{display:block}
+  .mobonly{display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%}
+  body.vsem table.pl{display:table}
+  body.vsem .mday{display:none}
+  body.vsem{--colw:84px;--namew:138px;--countw:104px}
+  body.vsem .pinfo b{font-size:11.5px}
+  body.vsem .pinfo>span{font-size:10px}
+  body.vsem .avatar{width:24px;height:24px;font-size:9.5px}
+  body.vsem td.cell{height:42px}
   .rail{position:fixed;inset:auto 0 0 0;width:100%;height:min(72vh,560px);z-index:70;border-left:none;
     border-top:1px solid var(--line-2);border-radius:12px 12px 0 0;transform:translateY(101%);
     transition:transform .22s;box-shadow:0 -8px 28px rgba(12,22,32,.28)}
@@ -415,7 +441,7 @@ body.nopin .burger{display:block}
   </div>
 </div>
 
-<button class="fabfav" id="fabFav" hidden>Créneaux</button>
+<button class="fabfav" id="fabFav">Créneaux</button>
 
 <dialog id="dlgShift">
   <div class="dlg-h"><h2 id="shTitle">Créneau</h2><span id="shSub"></span></div>
@@ -500,10 +526,12 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
-const VERSION = "v4 — 6 septembre 2026";
+const VERSION = "v10 — 7 septembre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
-const DB_OBSOLETE = "https://towerdefense-c303b-default-rtdb.firebaseio.com";
+const DB_ANCIENNES = ["https://towerdefense-c303b-default-rtdb.firebaseio.com",
+                      "https://score-tp-default-rtdb.europe-west1.firebasedatabase.app"];
+
 const DEF_NODE = "planning";
 const JOURS = ["lun.","mar.","mer.","jeu.","ven.","sam.","dim."];
 const JOURS_L = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
@@ -646,6 +674,30 @@ function anniversaireDans(iso,x){
 }
 let tt; function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2600)}
 const estMobile=()=>window.matchMedia("(max-width:1000px)").matches;
+function ajusterColonnes(){
+  const R=document.documentElement.style, mob=estMobile();
+  const over = !mob && window.innerWidth<1500;
+  document.body.classList.toggle("railover",over);
+  const fab=$("#fabFav");
+  if(fab) fab.classList.toggle("on",(mob||over)&&(vue==="planning"||vue==="journalier"));
+  if(mob){
+    ["--colw","--namew","--countw"].forEach(v=>R.removeProperty(v));
+    document.body.classList.remove("dense");
+    colSerre = (modeMobile==="semaine");
+    return;
+  }
+  const w=$("#page").clientWidth||window.innerWidth;
+  const railW = (!over && (vue==="planning"||vue==="journalier")) ? 186 : 0;
+  const nomW = w<1100?150:(w<1300?176:206);
+  const cntW = w<1100? 92:(w<1300?112:138);
+  const n=7*partsVis().length;
+  const col=Math.min(150,Math.max(56,Math.floor((w-railW-nomW-cntW-6)/n)));
+  R.setProperty("--colw",col+"px");
+  R.setProperty("--namew",nomW+"px");
+  R.setProperty("--countw",cntW+"px");
+  document.body.classList.toggle("dense",col<86);
+  colSerre = col<86;
+}
 function dl(blob,nom){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=nom;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
 function csv(lignes,nom){
   const t="\uFEFF"+lignes.map(r=>r.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(";")).join("\r\n");
@@ -668,6 +720,8 @@ let jourActif = (new Date().getDay()||7)-1;
 let empActif = null;
 let arme = null;
 let vue = "accueil";
+let modeMobile = "jour";
+let colSerre = false;
 let meteo = null, meteoTentee = false;
 
 const LS = {
@@ -675,11 +729,12 @@ const LS = {
   set:(k,v)=>{try{localStorage.setItem(LKEY+":"+k,JSON.stringify(v))}catch(e){}}
 };
 let dbUrl  = LS.get("db",  DEF_DB);
-if(/^https:\/\/towerdefense-c303b[^.]*\.firebaseio\.com\/?$/.test(dbUrl)){ dbUrl=DEF_DB; LS.set("db",dbUrl); }
+if(DB_ANCIENNES.includes(String(dbUrl).replace(/\/+$/,""))){ dbUrl=DEF_DB; LS.set("db",dbUrl); }
 let dbNode = LS.get("node",DEF_NODE);
 let user   = LS.get("user",{nom:"Utilisateur",role:"Manager"});
 let favMenu= LS.get("favMenu",FAV_DEF);
 let theme  = LS.get("theme","clair");
+modeMobile = LS.get("modeMobile","jour");
 
 function mirroir(){
   LS.set("mir",{cfg:ST.cfg,employes:ST.employes,replie:ST.replie,semId:semId(lundi),sem:ST.sem});
@@ -953,7 +1008,8 @@ const VUES={};
 async function rendre(){
   majEntete();
   document.body.classList.toggle("paint",!!arme);
-  $("#fabFav").hidden = !(vue==="planning"||vue==="journalier");
+  document.body.classList.toggle("vsem",modeMobile==="semaine");
+  ajusterColonnes();
   const f=VUES[vue];
   if(f) await f(); else vueBientot();
   brancherBarre();
@@ -1078,6 +1134,8 @@ function chip(s){
   }
   const d=fmt(duree(s));
   const ti=`${s.debut}-${s.fin} · pause ${s.pause||0} min · ${d}${s.poste?" · "+s.poste:""}${s.note?" — "+s.note:""}`;
+  if(colSerre) return `<div class="chip" style="background:${couleur(s.debut)}" title="${esc(ti)}">
+    <span class="h">${s.debut}</span><span class="h" style="opacity:.72">${s.fin}</span></div>`;
   return `<div class="chip" style="background:${couleur(s.debut)}" title="${esc(ti)}">
     <span class="h">${s.debut}-${s.fin}</span><span class="p">${s.poste?esc(s.poste):d}</span></div>`;
 }
@@ -1093,8 +1151,15 @@ const FILT={service:"",part:""};
 const partsVis = () => FILT.part?PARTS.filter(p=>p.id===FILT.part):PARTS;
 const empVisibles = () => listeEmployes().filter(e=>!FILT.service||e.service===FILT.service);
 
+function bascule(){
+  return `<div class="mobonly">
+    <button class="chipbtn${modeMobile==="jour"?" on":""}" data-vm="jour">Jour</button>
+    <button class="chipbtn${modeMobile==="semaine"?" on":""}" data-vm="semaine">Semaine</button>
+    ${modeMobile==="jour"?barJours():'<span class="muted" style="font-size:11.5px">Faites glisser le tableau horizontalement</span>'}
+  </div>`;
+}
 VUES.planning = ()=>{
-  bar(barSemaine(filtresPlanning()));
+  bar(barSemaine(filtresPlanning())+bascule());
   const emps=empVisibles(), js=jours();
   if(!emps.length) return page(etatVide());
   page(`<div class="planwrap"><div class="gridwrap" id="gridwrap">${grilleSemaine(emps,js)}${vueJourHTML(emps,js)}</div>${railHTML()}</div>`);
@@ -1187,6 +1252,9 @@ function brancherPlanning(){
   const fs=$("#fService"), fp=$("#fPart");
   if(fs) fs.onchange=()=>{FILT.service=fs.value;rendre()};
   if(fp) fp.onchange=()=>{FILT.part=fp.value;rendre()};
+  $$("#viewbar [data-vm]").forEach(b=>b.onclick=()=>{
+    modeMobile=b.dataset.vm; LS.set("modeMobile",modeMobile); rendre();
+  });
   brancherRail();
 }
 
@@ -2051,7 +2119,12 @@ $("#btnPin").onclick=()=>{
   fermerMenu();
   if(!on) toast("Menu détaché, utilisez le bouton en haut à gauche");
 };
-window.addEventListener("resize",()=>{ if(!estMobile()){ fermerMenu(); const r=$("#rail"); if(r)r.classList.remove("open"); } });
+let tRedim;
+window.addEventListener("resize",()=>{
+  clearTimeout(tRedim);
+  tRedim=setTimeout(ajusterColonnes,120);
+  if(!estMobile()){ fermerMenu(); const r=$("#rail"); if(r)r.classList.remove("open"); }
+});
 document.addEventListener("keydown",e=>{
   if(e.key==="Escape"&&arme&&!document.querySelector("dialog[open]")) armer(null);
 });

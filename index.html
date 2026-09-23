@@ -528,7 +528,7 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
-const VERSION = "v11 — 7 septembre 2026";
+const VERSION = "v12 — 23 septembre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
 const DB_ANCIENNES = ["https://towerdefense-c303b-default-rtdb.firebaseio.com",
@@ -595,6 +595,7 @@ const IC = {
   hs:'<path d="M4 19V9M9.3 19V5M14.7 19v-7M20 19v-4"/>',
   bed:'<path d="M3 19v-9M3 14h18v5"/><path d="M21 14v-2.5a2.5 2.5 0 0 0-2.5-2.5H10v5"/><circle cx="6.6" cy="11.4" r="1.9"/>',
   home:'<path d="M3 11l9-7.5 9 7.5"/><path d="M5.5 9.6V20h13V9.6"/><path d="M10 20v-5.5h4V20"/>',
+  copie:'<rect x="9" y="8.5" width="11.5" height="11.5" rx="2"/><path d="M5.5 15.5V5.5a2 2 0 0 1 2-2h8"/>',
   heart:'<path d="M12 20s-7.5-4.6-7.5-9.4A4.1 4.1 0 0 1 12 8.2a4.1 4.1 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z"/>'
 };
 const ico=(n,cls="ic")=>`<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]||IC.rows}</svg>`;
@@ -898,6 +899,7 @@ function creneauDe(emp,date,part){
   const src = sid===semId(lundi) ? ST.sem : (ST.cache[sid]||{});
   return (src[emp]&&src[emp][date]&&src[emp][date][part])||null;
 }
+const semaineDe = sid => (sid===semId(lundi) ? ST.sem : (ST.cache[sid]||{}));
 const lireCreneau=(e,d,p)=>(ST.sem&&ST.sem[e]&&ST.sem[e][d]&&ST.sem[e][d][p])||null;
 const lireReel=(e,d,p)=>(ST.reel&&ST.reel[e]&&ST.reel[e][d]&&ST.reel[e][d][p])||null;
 
@@ -1232,7 +1234,8 @@ function grilleSemaine(emps,js){
         h+=`<tr><td class="name"><div class="person">
           <span class="avatar" style="background:${avCol(e.id)}">${esc(initiales(e))}</span>
           <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${esc(e.poste||"")} <em>· ${fmt(e.contrat)}</em></span></span>
-          <button class="rowedit" data-emp="${e.id}">${ico("fileEdit","ic sm")}</button></div></td>${cells}
+          <button class="rowedit" data-copy="${e.id}" title="Copier ce planning">${ico("copie","ic sm")}</button>
+          <button class="rowedit" data-emp="${e.id}" title="Fiche">${ico("fileEdit","ic sm")}</button></div></td>${cells}
           <td class="count"><div class="cnt"><span>Consommé</span><b class="tnum">${fmt(t)}</b></div>
           <div class="cnt"><span>Écart</span><b class="tnum ${cl}">${ec>0?"+":""}${fmt(ec)}</b></div></td></tr>`;
       }
@@ -1277,6 +1280,7 @@ function vueJourHTML(emps,js){
         <span class="avatar" style="background:${avCol(e.id)}">${esc(initiales(e))}</span>
         <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${esc(e.poste||"")}</span>
         <span class="mini-cnt">${fmt(t)} / ${fmt(e.contrat)} <b class="${cl}">${ec>0?"+":""}${fmt(ec)}</b></span></span>
+        <button class="rowedit" data-copy="${e.id}">${ico("copie","ic sm")}</button>
         <button class="rowedit" data-emp="${e.id}">${ico("fileEdit","ic sm")}</button></div>${cs}</div>`;
     }
   }
@@ -1285,6 +1289,7 @@ function vueJourHTML(emps,js){
 function brancherPlanning(){
   $$("#page [data-fold]").forEach(b=>b.onclick=()=>{const s=b.dataset.fold;ST.replie[s]=!ST.replie[s];mirroir();rendre()});
   $$("#page [data-emp]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();ouvrirEmp(b.dataset.emp)});
+  $$("#page [data-copy]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();dlgCopie(b.dataset.copy)});
   const fs=$("#fService"), fp=$("#fPart");
   if(fs) fs.onchange=()=>{FILT.service=fs.value;rendre()};
   if(fp) fp.onchange=()=>{FILT.part=fp.value;rendre()};
@@ -1612,6 +1617,78 @@ VUES.absences = async ()=>{
   page(wrapPad(h+`</tbody></table></div>`));
   $("#btnAddAbs").onclick=dlgAbsence;
 };
+function optionsSemaines(sel){
+  return Array.from({length:11},(_,i)=>i-5).map(k=>{
+    const d=new Date(lundi); d.setDate(d.getDate()+k*7);
+    const lab="S"+isoSem(d).num+" — "+d.toLocaleDateString("fr-FR",{day:"2-digit",month:"short"})
+      +(k===0?" (affichée)":"");
+    return `<option value="${k}"${k===sel?" selected":""}>${lab}</option>`;
+  }).join("");
+}
+function dlgCopie(id){
+  const L=listeEmployes();
+  if(!L.length) return;
+  infoDlg("Copier un planning",`
+    <div class="field"><label for="cEmp">Salarié source</label>
+      <select id="cEmp">${L.map(e=>`<option value="${e.id}"${e.id===id?" selected":""}>${esc(nomComplet(e))}</option>`).join("")}</select></div>
+    <div class="row2">
+      <div class="field"><label for="cSrc">Depuis la semaine</label><select id="cSrc">${optionsSemaines(0)}</select></div>
+      <div class="field"><label for="cDst">Vers la semaine</label><select id="cDst">${optionsSemaines(1)}</select></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="cVers">Salarié destinataire</label>
+        <select id="cVers">${L.map(e=>`<option value="${e.id}"${e.id===id?" selected":""}>${esc(nomComplet(e))}</option>`).join("")}</select></div>
+      <div class="field"><label for="cRep">Répéter sur</label>
+        <select id="cRep">${[1,2,3,4,6,8,12].map(n=>`<option value="${n}">${n} semaine${n>1?"s":""}</option>`).join("")}</select></div>
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;font-size:12.5px">
+      <input type="checkbox" id="cEcr" checked style="width:auto"> Remplacer les créneaux déjà présents</label>
+    <p class="muted" style="margin:0;font-size:12px">Les repos et les absences sont copiés comme les créneaux de travail.</p>
+    <button class="btn primary" id="cOk" style="align-self:flex-start">Copier</button>
+    <span id="cRes" class="muted" style="font-size:12px"></span>`);
+  $("#cOk").onclick=async()=>{
+    $("#cRes").textContent="copie en cours…";
+    const n=await copierPlanning($("#cEmp").value,$("#cVers").value,
+      +$("#cSrc").value,+$("#cDst").value,+$("#cRep").value,$("#cEcr").checked);
+    $("#dlgInfo").close(); rendre();
+    toast(n?n+" créneaux copiés":"La semaine source ne contient rien pour ce salarié");
+  };
+}
+async function copierPlanning(src,dst,kSrc,kDst,repet,ecraser){
+  const lSrc=new Date(lundi); lSrc.setDate(lSrc.getDate()+kSrc*7);
+  const sidSrc=semId(lSrc);
+  const cibles=Array.from({length:repet},(_,r)=>{
+    const d=new Date(lundi); d.setDate(d.getDate()+(kDst+r)*7); return d;
+  });
+  await chargerSemaines([sidSrc,...cibles.map(semId)]);
+  const source=(semaineDe(sidSrc)[src])||{};
+  const dates=Object.keys(source).sort();
+  if(!dates.length) return 0;
+  let total=0;
+  for(const lCib of cibles){
+    const sidCib=semId(lCib), patch={};
+    const dejaLa=semaineDe(sidCib)[dst]||{};
+    for(const dSrc of dates){
+      const idx=joursEntre(ymd(lSrc),dSrc);
+      if(idx<0||idx>6) continue;
+      const dCib=new Date(lCib); dCib.setDate(dCib.getDate()+idx);
+      const clef=ymd(dCib);
+      for(const part of PARTS.map(x=>x.id)){
+        const val=source[dSrc][part]; if(!val) continue;
+        if(!ecraser && dejaLa[clef] && dejaLa[clef][part]) continue;
+        patch[dst+"/"+clef+"/"+part]=val; total++;
+        if(sidCib===semId(lundi)){
+          (ST.sem[dst]||={}); (ST.sem[dst][clef]||={}); ST.sem[dst][clef][part]=val;
+        }
+        const c=ST.cache[sidCib]; if(c){ (c[dst]||={}); (c[dst][clef]||={}); c[dst][clef][part]=val; }
+      }
+    }
+    if(Object.keys(patch).length) ecrireLot(sidCib,patch);
+  }
+  tracer("Copie du planning de "+nomComplet(emp(src))+" ("+sidSrc+") vers "
+    +nomComplet(emp(dst))+" sur "+repet+" semaine(s) — "+total+" créneaux");
+  return total;
+}
 function dlgAbsence(){
   const L=listeEmployes();
   if(!L.length) return toast("Ajoutez d'abord un salarié");

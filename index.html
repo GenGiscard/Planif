@@ -384,7 +384,7 @@ body.nopin .burger{display:block}
 @media print{
   @page{size:A4 landscape;margin:9mm}
   #sidebar,.topbar,#viewbar,.rail,.fabfav,.toast,.scrim,.rowedit{display:none!important}
-  :root{--colw:58px!important;--namew:132px!important;--countw:84px!important}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   #printHead{display:block;margin:0 0 7px}
   #printFoot{display:block;margin:9px 0 0;font-size:9px;color:#444}
   table.pl{font-size:8.6px!important}
@@ -395,7 +395,23 @@ body.nopin .burger{display:block}
   html,body,#page{overflow:visible;height:auto;background:#fff}
   .shell{display:block}
   .mday{display:none!important}
-  table.pl{display:table!important;width:100%;font-size:10px}
+  /* largeurs proportionnelles : la grille occupe exactement la page */
+  table.pl{display:table!important;table-layout:fixed!important;
+           width:100%!important;min-width:0!important;max-width:100%!important;font-size:8.4px!important}
+  th.corner,td.name{width:13%!important;min-width:0!important;max-width:none!important}
+  th.cornerc,td.count{width:8.5%!important;min-width:0!important;max-width:none!important}
+  th.part,td.cell{width:auto!important;min-width:0!important;max-width:none!important}
+  .chip{padding:1px 2px!important;overflow:hidden}
+  .chip .h{font-size:8.2px!important;letter-spacing:-.25px}
+  .chip .p{font-size:7px!important}
+  .pinfo b{font-size:8.6px!important}
+  .pinfo>span{font-size:7.4px!important}
+  .cnt{font-size:7.6px!important}
+  td.tot{font-size:7.6px!important}
+  th.day{font-size:8.6px!important;padding:3px 1px 1px}
+  th.part{font-size:7.6px!important;padding:1px}
+  td.name{padding:2px 4px!important}
+  td.count{padding:2px 4px!important}
   td.name,td.count,th.corner,th.cornerc,th.day,th.part,.grouphead{position:static}
   td.cell{height:34px}
 }
@@ -540,7 +556,7 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
-const VERSION = "v13 — 7 octobre 2026";
+const VERSION = "v14 — 7 octobre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
 const DB_ANCIENNES = ["https://towerdefense-c303b-default-rtdb.firebaseio.com",

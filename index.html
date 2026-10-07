@@ -380,8 +380,18 @@ body.nopin #sidebar{position:fixed;inset:0 auto 0 0;transform:translateX(-101%);
   transition:transform .22s;box-shadow:0 0 32px rgba(10,18,26,.28)}
 body.nopin #sidebar.open{transform:none}
 body.nopin .burger{display:block}
+#printHead,#printFoot{display:none}
 @media print{
-  #sidebar,.topbar,#viewbar,.rail,.fabfav,.toast,.scrim{display:none!important}
+  @page{size:A4 landscape;margin:9mm}
+  #sidebar,.topbar,#viewbar,.rail,.fabfav,.toast,.scrim,.rowedit{display:none!important}
+  :root{--colw:58px!important;--namew:132px!important;--countw:84px!important}
+  #printHead{display:block;margin:0 0 7px}
+  #printFoot{display:block;margin:9px 0 0;font-size:9px;color:#444}
+  table.pl{font-size:8.6px!important}
+  td.cell{height:30px!important}
+  .chip{border-color:#999}
+  .avatar{width:0;height:0;overflow:hidden;border:none}
+  tr,td,th{page-break-inside:avoid}
   html,body,#page{overflow:visible;height:auto;background:#fff}
   .shell{display:block}
   .mday{display:none!important}
@@ -521,6 +531,8 @@ body.nopin .burger{display:block}
   <div class="dlg-f"><div class="spacer"></div><button class="btn primary" id="infoClose">Fermer</button></div>
 </dialog>
 
+<div id="printHead" aria-hidden="true"></div>
+<div id="printFoot" aria-hidden="true"></div>
 <div class="toast" id="toast"></div>
 <script type="module">
 "use strict";
@@ -528,7 +540,7 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
-const VERSION = "v12 — 23 septembre 2026";
+const VERSION = "v13 — 7 octobre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
 const DB_ANCIENNES = ["https://towerdefense-c303b-default-rtdb.firebaseio.com",
@@ -701,10 +713,17 @@ function ajusterColonnes(){
   R.setProperty("--namew",nomW+"px");
   R.setProperty("--countw",cntW+"px");
   document.body.classList.toggle("dense",col<86);
-  colSerre=col<86;
+  if(!gelerSerre) colSerre=col<86;
+}
+async function imprimerSemaine(){
+  const avant=colSerre;
+  gelerSerre=true; colSerre=false;
+  await rendre();
+  window.print();
+  setTimeout(()=>{ gelerSerre=false; colSerre=avant; rendre(); },600);
 }
 /* deuxième passe : on rétrécit tant que le tableau dépasse réellement */
-let reajuste=false;
+let reajuste=false, gelerSerre=false;
 function verifierLargeur(){
   if(estMobile()||reajuste) return;
   const g=document.querySelector(".gridwrap"), t=g&&g.querySelector("table.pl");
@@ -715,7 +734,7 @@ function verifierLargeur(){
     col-=3; R.setProperty("--colw",col+"px");
   }
   document.body.classList.toggle("dense",col<86);
-  if(colSerre!==(col<86)){ colSerre=col<86; reajuste=true; rendre().then(()=>reajuste=false); }
+  if(!gelerSerre && colSerre!==(col<86)){ colSerre=col<86; reajuste=true; rendre().then(()=>reajuste=false); }
 }
 function dl(blob,nom){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=nom;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
 function csv(lignes,nom){
@@ -988,6 +1007,23 @@ window.addEventListener("hashchange",()=>{
 /* ============================================================
    7. RENDU GÉNÉRAL
    ============================================================ */
+function majEnteteImpression(){
+  const r=ST.cfg.resto||{}, js=jours(), sid=semId(lundi), v=ST.validations[sid];
+  const h=$("#printHead"); if(!h) return;
+  h.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-end;
+      border-bottom:2px solid #333;padding-bottom:4px">
+    <div><b style="font-size:13px">${esc(r.nom||"")}</b>
+      <span style="font-size:10px;letter-spacing:.06em"> ${esc((r.ville||"").toUpperCase())}</span>
+      <div style="font-size:10px;color:#555">${esc(itemDe(vue).lab)}</div></div>
+    <div style="text-align:right;font-size:10px;line-height:1.5">
+      <b style="font-size:12px">Semaine ${isoSem(lundi).num}</b> —
+      du ${js[0].toLocaleDateString("fr-FR")} au ${js[6].toLocaleDateString("fr-FR")}<br>
+      ${v?"Validée par "+esc(v.par):"Semaine non validée"}</div></div>`;
+  $("#printFoot").innerHTML=`<div style="display:flex;justify-content:space-between;
+      border-top:1px solid #999;padding-top:4px">
+    <span>Édité le ${new Date().toLocaleDateString("fr-FR")} par ${esc(user.nom)}</span>
+    <span>Signature du responsable :</span></div>`;
+}
 function majEntete(){
   const r=ST.cfg.resto||{};
   $("#etabNom").textContent=r.nom||"Mon restaurant";
@@ -1013,6 +1049,7 @@ function barSemaine(extra=""){
     <span class="range">${js[0].toLocaleDateString("fr-FR",{day:"2-digit",month:"long"})} au ${js[6].toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"})}</span>
     ${extra}
     <div class="spacer"></div>
+    <button class="btn sm" id="btnPrintSem">Imprimer</button>
     <button class="btn sm ${val?"":"primary"}" id="btnValider">${val?"Semaine validée par "+esc(val.par):"Valider la semaine"}</button>`;
 }
 function barJours(){
@@ -1037,13 +1074,15 @@ function brancherBarre(){
   $$("#viewbar [data-j]").forEach(b=>b.onclick=()=>{jourActif=+b.dataset.j;rendre()});
   const v=$("#btnValider");
   if(v) v.onclick=()=>{const sid=semId(lundi);valider(sid,!ST.validations[sid]);rendre()};
+  const pr=$("#btnPrintSem");
+  if(pr) pr.onclick=imprimerSemaine;
   const s=$("#selEmp");
   if(s) s.onchange=()=>{empActif=s.value;rendre()};
 }
 
 const VUES={};
 async function rendre(){
-  majEntete(); migrerPostes();
+  majEntete(); majEnteteImpression(); migrerPostes();
   document.body.classList.toggle("paint",!!arme);
   document.body.classList.toggle("vsem",modeMobile==="semaine");
   ajusterColonnes();
@@ -1396,7 +1435,7 @@ VUES.individuel = async ()=>{
     if(moisVue<0){moisVue=11;anVue--} if(moisVue>11){moisVue=0;anVue++}
     rendre();
   });
-  $("#btnImp").onclick=()=>window.print();
+  $("#btnImp").onclick=imprimerSemaine;
   $("#calBox").innerHTML = await calendrierMois(empActif,anVue,moisVue);
 };
 
@@ -1902,7 +1941,7 @@ VUES.impressions = ()=>{
     <p class="muted" style="font-size:12px;margin-top:14px">La vue s'ouvre puis la fenêtre d'impression apparaît. Choisissez le format paysage pour le planning hebdomadaire.</p></div>`));
   $$("#page [data-pr]").forEach(b=>b.onclick=async()=>{
     aller(b.dataset.pr);
-    setTimeout(()=>window.print(),700);
+    setTimeout(imprimerSemaine,700);
   });
 };
 

@@ -115,6 +115,9 @@ textarea{border:1px solid var(--line);background:var(--card);border-radius:var(-
 .btn.danger{border-color:#e3b6b0;color:var(--rouge)}
 .btn.sm{padding:5px 10px;font-size:12.5px}
 .chipbtn{border:1px solid var(--line);border-radius:14px;padding:5px 12px;font-size:12.5px;background:var(--card)}
+.swatches{display:flex;flex-wrap:wrap;gap:6px}
+.swatch{width:36px;height:28px;border-radius:5px;border:1px solid var(--line-2);font-size:9px;color:var(--ink-2)}
+.swatch.on{outline:2px solid var(--ink);outline-offset:1px}
 .chipbtn.on{background:var(--ink);border-color:var(--ink);color:var(--card);font-weight:600}
 .sync{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2);white-space:nowrap;
   padding:5px 9px;border-radius:14px}
@@ -215,8 +218,17 @@ td.cell.we{background:var(--card-2)}
 .chip .h{font-size:11.5px;font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
 .chip .p{font-size:10px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.82}
 .chip.abs{align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:.04em}
+.chip .note{font-size:9.5px;line-height:1.2;font-weight:600;opacity:.95;white-space:normal;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  border-top:1px solid rgba(0,0,0,.16);margin-top:1px;padding-top:1px}
+.chip.abs .note{border:none;margin:0;padding:0;font-weight:500;font-size:9px;letter-spacing:0}
+.chip.horsposte{box-shadow:inset 3px 0 0 #2b3a4a}
+.chip.horsposte .p{font-weight:700}
+td.cell{height:auto;min-height:48px}
+.chip{min-height:42px}
 .cell-empty{height:100%;min-height:40px;border-radius:3px;border:1px dashed transparent}
 td.cell:hover .cell-empty{border-color:var(--line-2);background:var(--card-2)}
+tr.invite td.name{background:repeating-linear-gradient(135deg,var(--card),var(--card) 7px,var(--card-2) 7px,var(--card-2) 14px)}
 tr.grouptot td{background:var(--card-2);border-bottom:1px solid var(--line-2);font-size:11.5px;color:var(--ink-2)}
 tr.grouptot td.name{background:var(--card-2);padding:5px 12px;font-weight:600}
 td.tot{text-align:center;padding:4px 2px;font-variant-numeric:tabular-nums}
@@ -248,7 +260,7 @@ tr.grouptot td.count{background:var(--card-2)}
 body.dense .chip{padding:2px 4px}
 body.dense .chip .h{font-size:10.5px}
 body.dense .chip .p{font-size:9.5px}
-body.dense td.cell{height:42px}
+body.dense td.cell{min-height:42px;height:auto}
 body.dense .pinfo b{font-size:12px}
 body.dense .pinfo>span{font-size:10.5px}
 body.dense .avatar{width:26px;height:26px;font-size:10px}
@@ -283,7 +295,7 @@ body.railover .rail h3 .close{display:block}
   overflow:hidden;white-space:nowrap;font-variant-numeric:tabular-nums}
 
 /* rail favoris */
-  .rail{width:158px;flex:none;border-left:1px solid var(--line);background:var(--paper);
+  .rail{width:var(--railw,158px);flex:none;border-left:1px solid var(--line);background:var(--paper);
   display:flex;flex-direction:column;overflow:hidden}
 .rail h3{margin:0;padding:10px 12px;font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--ink-2);
   border-bottom:1px solid var(--line);background:var(--card);display:flex;align-items:center}
@@ -337,6 +349,16 @@ html[data-theme=sombre] .warnbox{background:#332a1c;border-color:#4d4028;color:#
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 /* ============ mobile ============ */
+@media (max-width:1420px) and (min-width:1001px){
+  :root{--railw:126px}
+  .rail h3{padding:8px 9px;font-size:11px}
+  .railscroll{padding:6px}
+  .fav{padding:5px 6px}
+  .fav b{font-size:10.5px}
+  .fav>span{font-size:9px}
+  .railfoot{padding:6px}
+  .railfoot input{padding:4px;font-size:11px}
+}
 @media (max-width:1000px){
   #sidebar{position:fixed;inset:0 auto 0 0;transform:translateX(-101%);transition:transform .22s;
     box-shadow:0 0 32px rgba(10,18,26,.28)}
@@ -486,7 +508,10 @@ body.nopin .burger{display:block}
         <div class="field"><label for="shDur">Durée payée</label><input type="text" id="shDur" readonly></div>
       </div>
     </div>
-    <div class="field"><label for="shNote">Commentaire</label><input type="text" id="shNote" placeholder="Visible au survol de la case"></div>
+    <div class="field"><label for="shNote">Commentaire</label>
+      <input type="text" id="shNote" placeholder="Affiché directement dans le planning"></div>
+    <div class="field"><label>Couleur du bloc</label><div class="swatches" id="shCoul"></div></div>
+    <p class="muted" id="shSrv" style="margin:0;font-size:11.5px"></p>
   </div>
   <div class="dlg-f">
     <button class="btn danger" id="shDelete">Supprimer</button><div class="spacer"></div>
@@ -556,7 +581,7 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
-const VERSION = "v14 — 7 octobre 2026";
+const VERSION = "v15 — 16 octobre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
 const DB_ANCIENNES = ["https://towerdefense-c303b-default-rtdb.firebaseio.com",
@@ -579,6 +604,52 @@ const TYPES = {
 };
 const ABSENCES = ["RH","CP","RTT","MAL","AT","FORM"];
 const SEUIL_SOIR = 16*60+30;
+const PALETTE = [["Automatique",""],["Bleu","#bfe1f2"],["Vert","#a9e2ce"],["Menthe","#bfe8dc"],
+  ["Rouge","#e79087"],["Rose","#f2a4b8"],["Jaune","#f6df94"],["Orange","#f4b782"],
+  ["Cuivre","#f2a05f"],["Violet","#cdb2ea"],["Gris","#d8dde1"],["Sable","#e6d5b4"]];
+function devinerService(nomPoste){
+  const x=String(nomPoste).toLowerCase(), dispo=ST.cfg.services||[];
+  const trouve=mot=>dispo.find(sv=>sv.toLowerCase().includes(mot));
+  if(/cuisin|grilladin|plong|pizz|chef|commis|p[aâ]tis/.test(x)) return trouve("cuisin")||dispo[0];
+  if(/serveur|runner|barman|bar|salle|h[oô]te|caiss|limonad/.test(x)) return trouve("salle")||dispo[0];
+  if(/directeur|responsable|manager|leader|adjoint|g[ée]rant/.test(x)) return trouve("responsable")||dispo[0];
+  return dispo[0];
+}
+const serviceDuPoste = pst => (ST.cfg.posteService||{})[pst] || null;
+function postePourService(e,srv){
+  if(!srv || serviceDuPoste(e.poste)===srv) return e.poste||"";
+  for(const d of jours()){ const dd=ymd(d);
+    for(const pt of PARTS){ const c=lireCreneau(e.id,dd,pt.id);
+      if(c && c.type==="travail" && serviceDuPoste(c.poste)===srv) return c.poste; } }
+  return (ST.cfg.postes||[]).find(x=>serviceDuPoste(x)===srv) || e.poste || "";
+}
+/* créneau visible dans ce secteur : travail rattaché au secteur du poste tenu,
+   absences et repos uniquement dans le secteur de rattachement du salarié */
+function creneauSecteur(e,dd,part,srv){
+  const c=lireCreneau(e.id,dd,part); if(!c) return null;
+  if(c.type!=="travail") return (!srv || e.service===srv) ? c : null;
+  return (!srv || (serviceDuPoste(c.poste)||e.service)===srv) ? c : null;
+}
+/* un salarié apparaît dans son secteur de rattachement et dans tout secteur
+   où il tient au moins un poste dans la semaine affichée */
+function parSecteur(emps,js){
+  const res={}; for(const sv of ST.cfg.services) res[sv]=[];
+  for(const e of emps){
+    const vus=new Set();
+    if(res[e.service]) vus.add(e.service);
+    for(const d of js){ const dd=ymd(d);
+      for(const pt of PARTS){ const c=lireCreneau(e.id,dd,pt.id);
+        if(c&&c.type==="travail"){ const sv=serviceDuPoste(c.poste); if(sv&&res[sv]) vus.add(sv); } } }
+    for(const sv of vus) res[sv].push(e);
+  }
+  return res;
+}
+function heuresSecteur(e,js,srv){
+  let t=0;
+  for(const d of js){ const dd=ymd(d);
+    for(const pt of PARTS) t+=duree(creneauSecteur(e,dd,pt.id,srv)); }
+  return t;
+}
 const partAttendue = debut => toMin(debut) >= SEUIL_SOIR ? "soir" : "midi";
 const BANDES = [
   {max:9*60+29,bg:"#bfe1f2"},{max:10*60+29,bg:"#a9e2ce"},{max:11*60+19,bg:"#bfe8dc"},
@@ -709,7 +780,7 @@ let tt; function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("o
 const estMobile=()=>window.matchMedia("(max-width:1000px)").matches;
 function ajusterColonnes(){
   const R=document.documentElement.style, mob=estMobile();
-  const over = !mob && (!railPin || window.innerWidth<1500);
+  const over = !mob && !railPin;
   document.body.classList.toggle("railover",over);
   const fab=$("#fabFav");
   if(fab) fab.classList.toggle("on",(mob||over)&&(vue==="planning"||vue==="journalier"));
@@ -765,7 +836,7 @@ function infoDlg(titre,html){ $("#infoTitle").textContent=titre; $("#infoBody").
 const favDefaut = () => Object.fromEntries(FAV_DEFAUT.map(([d,f,p])=>[uid(),{debut:d,fin:f,pause:p}]));
 let ST = {
   cfg:{ resto:{nom:"Mon restaurant",ville:"",adresse:"",lat:48.638,lon:4.949},
-        services:[...SERVICES_DEF], postes:[...POSTES_DEF], favoris:favDefaut() },
+        services:[...SERVICES_DEF], postes:[...POSTES_DEF], posteService:{}, favoris:favDefaut() },
   employes:{}, sem:{}, reel:{}, validations:{}, traces:{},
   cache:{}, replie:{}
 };
@@ -866,7 +937,8 @@ async function initFirebase(){
     FB.onValue(FB.ref(FB.db,dbNode+"/config"),s=>{
       const v=s.val();
       if(v) ST.cfg={ resto:{...ST.cfg.resto,...(v.resto||{})}, services:v.services||ST.cfg.services,
-                     postes:v.postes||ST.cfg.postes, favoris:v.favoris||{} };
+                     postes:v.postes||ST.cfg.postes,
+                     posteService:v.posteService||ST.cfg.posteService||{}, favoris:v.favoris||{} };
       mirroir(); majEntete(); rendre();
     },()=>{ majSync("off","Accès refusé"); toast("Firebase refuse la lecture du nœud « "+dbNode+" »"); });
     FB.onValue(FB.ref(FB.db,dbNode+"/employes"),s=>{ ST.employes=s.val()||{}; mirroir(); rendre(); });
@@ -958,6 +1030,14 @@ function migrerPostes(){
   for(const [id,e] of Object.entries(ST.employes||{})){
     if(e.poste==="Leader"){ e.poste="Responsable"; ecrireEmploye(id,e); ch=true; }
   }
+  const map=ST.cfg.posteService||{};
+  let chMap=false;
+  if(map.Leader){ map.Responsable=map.Responsable||map.Leader; delete map.Leader; chMap=true; }
+  for(const pst of (ST.cfg.postes||[]))
+    if(!map[pst]||!(ST.cfg.services||[]).includes(map[pst])){ map[pst]=devinerService(pst); chMap=true; }
+  for(const k of Object.keys(map))
+    if(!(ST.cfg.postes||[]).includes(k)){ delete map[k]; chMap=true; }
+  if(chMap){ ST.cfg.posteService=map; ch=true; }
   if(ch){ migrationFaite=true; ecrireCfg(); }
 }
 const nomComplet = e => ((e.prenom||"")+" "+(e.nom||"")).trim()||"Salarié";
@@ -1219,18 +1299,25 @@ async function calendrierMois(id,an,mois){
 /* ============================================================
    9. PLANNING HEBDOMADAIRE
    ============================================================ */
-function chip(s){
+function chip(s,e){
   if(!s) return '<div class="cell-empty"></div>';
   if(s.type!=="travail"){
     const t=TYPES[s.type]||TYPES.RH;
-    return `<div class="chip abs" style="background:${t.bg};color:${t.fg}" title="${esc(t.lab)}${s.note?" — "+esc(s.note):""}">${t.code}</div>`;
+    return `<div class="chip abs" style="background:${s.coul||t.bg};color:${t.fg}"
+      title="${esc(t.lab)}${s.note?" — "+esc(s.note):""}">${t.code}${s.note?`<span class="note">${esc(s.note)}</span>`:""}</div>`;
   }
   const d=fmt(duree(s));
-  const ti=`${s.debut}-${s.fin} · pause ${s.pause||0} min · ${d}${s.poste?" · "+s.poste:""}${s.note?" — "+s.note:""}`;
-  if(colSerre) return `<div class="chip" style="background:${couleur(s.debut)}" title="${esc(ti)}">
-    <span class="h">${s.debut}</span><span class="h" style="opacity:.72">${s.fin}</span></div>`;
-  return `<div class="chip" style="background:${couleur(s.debut)}" title="${esc(ti)}">
-    <span class="h">${s.debut}-${s.fin}</span><span class="p">${s.poste?esc(s.poste):d}</span></div>`;
+  const horsPoste = e && s.poste && e.poste && s.poste!==e.poste;
+  const ti=`${s.debut}-${s.fin} · pause ${s.pause||0} min · ${d}`
+    +(s.poste?" · "+s.poste+(horsPoste?" (poste inhabituel, habituellement "+e.poste+")":""):"")
+    +(s.note?" — "+s.note:"");
+  const fond=s.coul||couleur(s.debut);
+  const note=s.note?`<span class="note">${esc(s.note)}</span>`:"";
+  if(colSerre) return `<div class="chip${horsPoste?" horsposte":""}" style="background:${fond}" title="${esc(ti)}">
+    <span class="h">${s.debut}</span><span class="h" style="opacity:.72">${s.fin}</span>${note}</div>`;
+  return `<div class="chip${horsPoste?" horsposte":""}" style="background:${fond}" title="${esc(ti)}">
+    <span class="h">${s.debut}-${s.fin}</span>
+    <span class="p">${s.poste?(horsPoste?"&#9679; ":"")+esc(s.poste):d}</span>${note}</div>`;
 }
 function filtresPlanning(){
   return `<label class="fl" for="fService">Service</label>
@@ -1273,39 +1360,48 @@ function grilleSemaine(emps,js){
     for(const p of parts) h+=`<th class="part${we?" we":""}">${p.lab}</th>`;}
   h+='</tr></thead>';
   const nb=2+js.length*parts.length;
+  const grp=parSecteur(emps,js);
   for(const srv of ST.cfg.services){
-    const list=emps.filter(e=>e.service===srv);
+    const list=grp[srv]||[];
     if(!list.length) continue;
-    const rep=!!ST.replie[srv];
+    const plie=!!ST.replie[srv];
     h+=`<tbody><tr class="grouprow"><td colspan="${nb}"><div class="grouphead">
-      <button data-fold="${esc(srv)}">${rep?"&#9656;":"&#9662;"}</button>${esc(srv)}
+      <button data-fold="${esc(srv)}">${plie?"&#9656;":"&#9662;"}</button>${esc(srv)}
       <span class="count">${list.length} salarié${list.length>1?"s":""}</span></div></td></tr>`;
-    if(!rep){
+    if(!plie){
       for(const e of list){
+        const invite = e.service!==srv;
         let cells="";
         for(const d of js){const dd=ymd(d),we=d.getDay()===0||d.getDay()===6;
-          for(const p of parts) cells+=`<td class="cell${we?" we":""}" data-e="${e.id}" data-d="${dd}" data-p="${p.id}">${chip(lireCreneau(e.id,dd,p.id))}</td>`;}
+          for(const p of parts) cells+=`<td class="cell${we?" we":""}" data-e="${e.id}" data-d="${dd}"
+            data-p="${p.id}" data-srv="${esc(srv)}">${chip(creneauSecteur(e,dd,p.id,srv),e)}</td>`;}
         const t=totalSemaine(e.id), ec=t-(e.contrat||0), cl=ec>0?"over":(ec<0?"under":"");
-        h+=`<tr><td class="name"><div class="person">
+        const hs=heuresSecteur(e,js,srv);
+        const compteur = invite
+          ? `<div class="cnt"><span>Dans ce secteur</span><b class="tnum">${fmt(hs)}</b></div>
+             <div class="cnt"><span>Semaine</span><b class="tnum">${fmt(t)}</b></div>`
+          : `<div class="cnt"><span>Consommé</span><b class="tnum">${fmt(t)}</b></div>
+             <div class="cnt"><span>Écart</span><b class="tnum ${cl}">${ec>0?"+":""}${fmt(ec)}</b></div>`;
+        h+=`<tr${invite?' class="invite"':''}><td class="name"><div class="person">
           <span class="avatar" style="background:${avCol(e.id)}">${esc(initiales(e))}</span>
-          <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${esc(e.poste||"")} <em>· ${fmt(e.contrat)}</em></span></span>
+          <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${esc(postePourService(e,srv))}
+            <em>· ${invite?"renfort &#8212; "+esc(e.service):fmt(e.contrat)}</em></span></span>
           <button class="rowedit" data-copy="${e.id}" title="Copier ce planning">${ico("copie","ic sm")}</button>
           <button class="rowedit" data-emp="${e.id}" title="Fiche">${ico("fileEdit","ic sm")}</button></div></td>${cells}
-          <td class="count"><div class="cnt"><span>Consommé</span><b class="tnum">${fmt(t)}</b></div>
-          <div class="cnt"><span>Écart</span><b class="tnum ${cl}">${ec>0?"+":""}${fmt(ec)}</b></div></td></tr>`;
+          <td class="count">${compteur}</td></tr>`;
       }
-      h+=totauxGroupe(list,js,parts);
+      h+=totauxGroupe(list,js,parts,srv);
     }
     h+='</tbody>';
   }
   return h+'</table>';
 }
-function totauxGroupe(list,js,parts){
+function totauxGroupe(list,js,parts,srv){
   let eR="",hR="",tE=0,tH=0;
   for(const d of js){const dd=ymd(d);
     for(const p of parts){
       let e=0,hh=0;
-      for(const s of list){const c=lireCreneau(s.id,dd,p.id); if(c&&c.type==="travail"){e++;hh+=duree(c)}}
+      for(const s of list){const c=creneauSecteur(s,dd,p.id,srv); if(c&&c.type==="travail"){e++;hh+=duree(c)}}
       tE+=e;tH+=hh;
       eR+=`<td class="tot"><b>${e||"—"}</b></td>`;
       hR+=`<td class="tot">${hh?fmt(hh):"—"}</td>`;
@@ -1321,19 +1417,22 @@ function vueJourHTML(emps,js){
   let h=`<div class="mday"><div class="mhead" style="${cols}"><span>${JOURS_L[jourActif]} ${pad(d.getDate())}/${pad(d.getMonth()+1)}</span>`;
   for(const p of parts) h+=`<span>${p.lab}</span>`;
   h+=`</div>`;
+  const grp=parSecteur(emps,[d]);
   for(const srv of ST.cfg.services){
-    const list=emps.filter(e=>e.service===srv);
+    const list=grp[srv]||[];
     if(!list.length) continue;
     let eff=0,hh=0;
-    for(const e of list) for(const p of PARTS){const c=lireCreneau(e.id,dd,p.id); if(c&&c.type==="travail"){eff++;hh+=duree(c)}}
+    for(const e of list) for(const p of PARTS){const c=creneauSecteur(e,dd,p.id,srv); if(c&&c.type==="travail"){eff++;hh+=duree(c)}}
     h+=`<div class="mgtitle">${esc(srv)}<span class="count">${eff} poste${eff>1?"s":""} · ${fmt(hh)}</span></div>`;
     for(const e of list){
+      const invite=e.service!==srv;
       const t=totalSemaine(e.id), ec=t-(e.contrat||0), cl=ec>0?"over":(ec<0?"under":"");
       let cs="";
-      for(const p of parts) cs+=`<div class="mcell" data-e="${e.id}" data-d="${dd}" data-p="${p.id}">${chip(lireCreneau(e.id,dd,p.id))}</div>`;
+      for(const p of parts) cs+=`<div class="mcell" data-e="${e.id}" data-d="${dd}" data-p="${p.id}"
+        data-srv="${esc(srv)}">${chip(creneauSecteur(e,dd,p.id,srv),e)}</div>`;
       h+=`<div class="mrow" style="${cols}"><div class="mperson">
         <span class="avatar" style="background:${avCol(e.id)}">${esc(initiales(e))}</span>
-        <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${esc(e.poste||"")}</span>
+        <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${esc(postePourService(e,srv))}${invite?" &#8212; renfort":""}</span>
         <span class="mini-cnt">${fmt(t)} / ${fmt(e.contrat)} <b class="${cl}">${ec>0?"+":""}${fmt(ec)}</b></span></span>
         <button class="rowedit" data-copy="${e.id}">${ico("copie","ic sm")}</button>
         <button class="rowedit" data-emp="${e.id}">${ico("fileEdit","ic sm")}</button></div>${cs}</div>`;
@@ -1364,23 +1463,26 @@ VUES.journalier = ()=>{
   const d=js[jourActif], dd=ymd(d), parts=partsVis();
   let h=`<div class="card" style="overflow:hidden"><table class="tb"><thead><tr>
     <th>Salarié</th><th>Poste</th>${parts.map(p=>`<th>${p.lab}</th>`).join("")}<th class="num">Heures du jour</th></tr></thead><tbody>`;
+  const grp=parSecteur(emps,[d]);
   for(const srv of ST.cfg.services){
-    const list=emps.filter(e=>e.service===srv);
+    const list=grp[srv]||[];
     if(!list.length) continue;
     let hh=0, eff=0;
-    for(const e of list) for(const p of PARTS){const c=lireCreneau(e.id,dd,p.id);if(c&&c.type==="travail"){hh+=duree(c);eff++}}
+    for(const e of list) for(const p of PARTS){const c=creneauSecteur(e,dd,p.id,srv);if(c&&c.type==="travail"){hh+=duree(c);eff++}}
     h+=`<tr class="grouprow"><td colspan="${3+parts.length}"><b style="letter-spacing:.05em">${esc(srv)}</b>
       <span class="muted"> — ${eff} poste${eff>1?"s":""} · ${fmt(hh)}</span></td></tr>`;
     for(const e of list){
+      const invite=e.service!==srv;
       let jt=0, cs="";
       for(const p of parts){
-        const c=lireCreneau(e.id,dd,p.id); jt+=duree(c);
+        const c=creneauSecteur(e,dd,p.id,srv); jt+=duree(c);
         cs+=`<td style="padding:3px"><div class="mcell" style="min-height:40px;background:transparent"
-          data-e="${e.id}" data-d="${dd}" data-p="${p.id}">${chip(c)}</div></td>`;
+          data-e="${e.id}" data-d="${dd}" data-p="${p.id}" data-srv="${esc(srv)}">${chip(c,e)}</div></td>`;
       }
       h+=`<tr><td><div class="person"><span class="avatar" style="background:${avCol(e.id)}">${esc(initiales(e))}</span>
         <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${fmt(totalSemaine(e.id))} sur la semaine</span></span></div></td>
-        <td class="muted">${esc(e.poste||"")}</td>${cs}<td class="num">${jt?fmt(jt):"—"}</td></tr>`;
+        <td class="muted">${esc(postePourService(e,srv))}${invite?' <span style="font-size:11px">(renfort)</span>':""}</td>
+        ${cs}<td class="num">${jt?fmt(jt):"—"}</td></tr>`;
     }
   }
   page(`<div class="planwrap"><div class="gridwrap" style="background:var(--paper)">${wrapPad(h+"</tbody></table></div>")}</div>${railHTML()}</div>`);
@@ -1402,25 +1504,26 @@ VUES.timeline = ()=>{
     <div class="tlhead" style="${cols}"><span style="border:none;padding-left:12px">Heure</span>
     <div style="display:grid;grid-template-columns:repeat(${N},1fr)">`+
     heures.map(x=>`<span>${pad(x)}h</span>`).join("")+`</div></div>`;
+  const grp=parSecteur(emps,[js[jourActif]]);
   for(const srv of ST.cfg.services){
-    const list=emps.filter(e=>e.service===srv);
+    const list=grp[srv]||[];
     if(!list.length) continue;
     h+=`<div class="mgtitle">${esc(srv)}</div>`;
     for(const e of list){
       let bars="";
       for(const p of PARTS){
-        const c=lireCreneau(e.id,dd,p.id); if(!c) continue;
+        const c=creneauSecteur(e,dd,p.id,srv); if(!c) continue;
         if(c.type!=="travail"){ continue; }
         let a=toMin(c.debut)/60, b=toMin(c.fin)/60; if(b<=a)b+=24;
         const g=Math.max(H0,a), f=Math.min(H1,b);
         if(f<=g) continue;
-        bars+=`<div class="tlbar" style="left:${(g-H0)/N*100}%;width:${(f-g)/N*100}%;background:${couleur(c.debut)}"
-          title="${c.debut}-${c.fin} · ${fmt(duree(c))}">${c.debut}-${c.fin}</div>`;
+        bars+=`<div class="tlbar" style="left:${(g-H0)/N*100}%;width:${(f-g)/N*100}%;background:${c.coul||couleur(c.debut)}"
+          title="${c.debut}-${c.fin} · ${fmt(duree(c))}${c.note?" — "+esc(c.note):""}">${c.debut}-${c.fin}${c.note?" · "+esc(c.note):""}</div>`;
       }
-      const abs=PARTS.map(p=>lireCreneau(e.id,dd,p.id)).find(c=>c&&c.type!=="travail");
+      const abs=PARTS.map(p=>creneauSecteur(e,dd,p.id,srv)).find(c=>c&&c.type!=="travail");
       h+=`<div class="tlrow" style="${cols}"><div class="tlname"><div class="person">
         <span class="avatar" style="background:${avCol(e.id)}">${esc(initiales(e))}</span>
-        <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${esc(e.poste||"")}</span></span></div></div>
+        <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${esc(postePourService(e,srv))}</span></span></div></div>
         <div class="tltrack"><div class="tlgrid" style="grid-template-columns:repeat(${N},1fr)">${"<i></i>".repeat(N)}</div>
         ${bars||(abs?`<div class="tlbar" style="left:2px;width:110px;background:${TYPES[abs.type].bg};color:${TYPES[abs.type].fg}">${TYPES[abs.type].lab}</div>`:"")}</div></div>`;
     }
@@ -1844,12 +1947,31 @@ VUES.services = ()=>{
       <textarea id="tServices" rows="8">${esc(ST.cfg.services.join("\n"))}</textarea></div>
     <div class="card" style="padding:16px"><div class="h2">Postes</div>
       <p class="muted" style="font-size:12px;margin:0 0 8px">Un par ligne. Proposés dans la fiche salarié et dans l'éditeur de créneau.</p>
-      <textarea id="tPostes" rows="10">${esc(ST.cfg.postes.join("\n"))}</textarea></div></div>`));
+      <textarea id="tPostes" rows="10">${esc(ST.cfg.postes.join("\n"))}</textarea></div></div>
+    <div class="card" style="padding:16px;max-width:760px;margin-top:14px">
+      <div class="h2">Rattachement des postes</div>
+      <p class="muted" style="font-size:12px;margin:0 0 10px">
+        Chaque poste appartient à un secteur. Un salarié apparaît dans le secteur du poste qu'il tient
+        sur le créneau, en plus de son secteur de rattachement. Un plongeur ponctuel s'affiche donc en cuisine
+        même s'il est serveur de métier.</p>
+      <div class="tbwrap"><table class="tb"><thead><tr><th>Poste</th><th>Secteur</th></tr></thead><tbody>`+
+      ST.cfg.postes.map(pst=>`<tr><td>${esc(pst)}</td><td style="max-width:240px">
+        <select data-map="${esc(pst)}">${ST.cfg.services.map(sv=>
+          `<option${serviceDuPoste(pst)===sv?" selected":""}>${esc(sv)}</option>`).join("")}</select></td></tr>`).join("")+
+      `</tbody></table></div></div>`));
+  $$("#page [data-map]").forEach(sel=>sel.onchange=()=>{
+    ST.cfg.posteService={...(ST.cfg.posteService||{}),[sel.dataset.map]:sel.value};
+  });
   $("#btnSaveSrv").onclick=()=>{
     const sv=$("#tServices").value.split("\n").map(s=>s.trim()).filter(Boolean);
     const po=$("#tPostes").value.split("\n").map(s=>s.trim()).filter(Boolean);
     if(sv.length) ST.cfg.services=sv;
     if(po.length) ST.cfg.postes=po;
+    const map={...(ST.cfg.posteService||{})};
+    for(const pst of ST.cfg.postes)
+      if(!map[pst]||!ST.cfg.services.includes(map[pst])) map[pst]=devinerService(pst);
+    for(const k of Object.keys(map)) if(!ST.cfg.postes.includes(k)) delete map[k];
+    ST.cfg.posteService=map;
     for(const [id,e] of Object.entries(ST.employes)){
       let ch=false;
       if(!ST.cfg.services.includes(e.service)){e.service=ST.cfg.services[0];ch=true}
@@ -2100,13 +2222,14 @@ function appliquer(td){
   }
   dejaPeint.add(k);
   let val=null;
+  const e={id:td.dataset.e,...emp(td.dataset.e)};
   if(arme.kind==="abs") val={type:arme.type};
   else if(arme.kind==="fav"){
-    const e=emp(td.dataset.e);
-    val={type:"travail",debut:arme.debut,fin:arme.fin,pause:arme.pause||0,poste:e.poste||""};
+    val={type:"travail",debut:arme.debut,fin:arme.fin,pause:arme.pause||0,
+         poste:postePourService(e,td.dataset.srv)};
   }
   ecrireCreneau(td.dataset.e,td.dataset.d,td.dataset.p,val);
-  td.innerHTML=chip(val);
+  td.innerHTML=chip(val,e);
 }
 
 /* ============================================================
@@ -2114,16 +2237,25 @@ function appliquer(td){
    ============================================================ */
 let cible=null;
 function ouvrirCreneau(td){
-  cible={e:td.dataset.e,d:td.dataset.d,p:td.dataset.p};
-  const e=emp(cible.e), ex=lireCreneau(cible.e,cible.d,cible.p);
-  const s=ex||{type:"travail",debut:"11:50",fin:"15:00",pause:10,poste:e.poste||""};
+  cible={e:td.dataset.e,d:td.dataset.d,p:td.dataset.p,srv:td.dataset.srv||""};
+  const e={id:cible.e,...emp(cible.e)}, ex=lireCreneau(cible.e,cible.d,cible.p);
+  const s=ex||{type:"travail",debut:"11:50",fin:"15:00",pause:10,poste:postePourService(e,cible.srv)};
   $("#shTitle").textContent=nomComplet(e);
-  $("#shSub").textContent=dLong(dateDe(cible.d))+" · "+cible.p;
+  $("#shSub").textContent=dLong(dateDe(cible.d))+" · "+cible.p+(cible.srv?" · "+cible.srv:"");
   $("#shTypes").innerHTML=Object.entries(TYPES).map(([k,v])=>
     `<button class="chipbtn${k===s.type?" on":""}" data-t="${k}">${v.lab}</button>`).join("");
   $$("#shTypes .chipbtn").forEach(b=>b.onclick=()=>{
     $$("#shTypes .chipbtn").forEach(x=>x.classList.remove("on")); b.classList.add("on"); majZone();});
-  $("#shPoste").innerHTML=ST.cfg.postes.map(p=>`<option${p===(s.poste||e.poste)?" selected":""}>${esc(p)}</option>`).join("");
+  const choisi=s.poste||e.poste;
+  $("#shPoste").innerHTML=ST.cfg.postes.map(p=>`<option${p===choisi?" selected":""}>${esc(p)}</option>`).join("");
+  $("#shCoul").innerHTML=PALETTE.map(([lab,c])=>
+    `<button type="button" class="swatch${(s.coul||"")===c?" on":""}" data-coul="${c}" title="${esc(lab)}"
+      style="background:${c||"transparent"}">${c?"":"auto"}</button>`).join("");
+  $$("#shCoul .swatch").forEach(b=>b.onclick=()=>{
+    $$("#shCoul .swatch").forEach(x=>x.classList.remove("on")); b.classList.add("on"); });
+  const majSrv=()=>{ const sv=serviceDuPoste($("#shPoste").value);
+    $("#shSrv").textContent = sv ? "Ce poste place le salarié dans le secteur « "+sv+" »." : ""; };
+  $("#shPoste").onchange=majSrv; majSrv();
   $("#shStart").value=s.debut||"11:50"; $("#shEnd").value=s.fin||"15:00";
   $("#shPause").value=s.pause??10; $("#shNote").value=s.note||"";
   $("#shDelete").style.display=ex?"":"none";
@@ -2138,10 +2270,14 @@ $("#shSave").onclick=()=>{
   if(t==="travail" && partAttendue($("#shStart").value)!==cible.p)
     return toast("Un créneau démarrant à "+$("#shStart").value+" relève du service du "
                  +partAttendue($("#shStart").value)+", pas du "+cible.p);
+  const sw=$("#shCoul .swatch.on");
+  const coul=sw?sw.dataset.coul:"";
   const v = t==="travail"
-    ? {type:"travail",debut:$("#shStart").value,fin:$("#shEnd").value,pause:+$("#shPause").value||0,poste:$("#shPoste").value,note}
-    : {type:t,note};
+    ? {type:"travail",debut:$("#shStart").value,fin:$("#shEnd").value,pause:+$("#shPause").value||0,
+       poste:$("#shPoste").value,note,coul}
+    : {type:t,note,coul};
   if(!v.note) delete v.note;
+  if(!v.coul) delete v.coul;
   ecrireCreneau(cible.e,cible.d,cible.p,v); $("#dlgShift").close(); rendre();
 };
 $("#shDelete").onclick=()=>{ecrireCreneau(cible.e,cible.d,cible.p,null);$("#dlgShift").close();rendre()};

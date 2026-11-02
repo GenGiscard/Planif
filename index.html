@@ -601,7 +601,7 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
-const VERSION = "v16 — 2 novembre 2026";
+const VERSION = "v17 — 2 novembre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
 const DB_ANCIENNES = ["https://towerdefense-c303b-default-rtdb.firebaseio.com",
@@ -881,7 +881,8 @@ let favMenu= LS.get("favMenu",FAV_DEF);
 let theme  = LS.get("theme","clair");
 modeMobile = LS.get("modeMobile","jour");
 let railPin = LS.get("railPin",true);
-let modeGlisse = LS.get("modeGlisse","deplacer");
+let modeGlisse = LS.get("modeGlisse","dupliquer");
+if(!LS.get("modeGlisseV2",false)){ modeGlisse="dupliquer"; LS.set("modeGlisse",modeGlisse); LS.set("modeGlisseV2",true); }
 
 function mirroir(){
   LS.set("mir",{cfg:ST.cfg,employes:ST.employes,replie:ST.replie,semId:semId(lundi),sem:ST.sem});
@@ -2138,8 +2139,8 @@ function railHTML(){
       <div class="armed${arme?" on":""}" id="armedBanner"><span id="armedText">${arme?texteArme():""}</span><br><button id="disarm">Arrêter</button></div>
       <p class="railhint">Glissez un créneau sur le planning. Un clic l'applique à plusieurs cases d'affilée.</p>
       <div class="glissemode"><span>Créneau déjà posé, en le glissant</span>
-        <button class="gm${modeGlisse==="deplacer"?" on":""}" data-gm="deplacer">Déplacer</button>
-        <button class="gm${modeGlisse==="dupliquer"?" on":""}" data-gm="dupliquer">Dupliquer</button></div>
+        <button class="gm${modeGlisse==="dupliquer"?" on":""}" data-gm="dupliquer">Dupliquer</button>
+        <button class="gm${modeGlisse==="deplacer"?" on":""}" data-gm="deplacer">Déplacer</button></div>
       <div class="absrow" id="absRow">${absHTML()}</div>
       <div class="favgrid" id="favGrid">${favHTML()}</div>
     </div>

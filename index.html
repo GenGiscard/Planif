@@ -115,6 +115,26 @@ textarea{border:1px solid var(--line);background:var(--card);border-radius:var(-
 .btn.danger{border-color:#e3b6b0;color:var(--rouge)}
 .btn.sm{padding:5px 10px;font-size:12.5px}
 .chipbtn{border:1px solid var(--line);border-radius:14px;padding:5px 12px;font-size:12.5px;background:var(--card)}
+/* --- glisser-déposer --- */
+.dragghost{position:fixed;z-index:200;pointer-events:none;transform:translate(-50%,-150%);
+  display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:6px;background:var(--card);
+  border:1px solid var(--line-2);box-shadow:0 8px 22px rgba(12,22,32,.32);
+  font-size:11.5px;font-weight:650;white-space:nowrap;color:var(--ink)}
+.dragghost .dgp{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.18);flex:none}
+.dragghost em{font-style:normal;font-weight:500;color:var(--ink-2);font-size:10.5px}
+td.cell.survol,.mcell.survol{outline:2px solid var(--accent);outline-offset:-2px;background:var(--accent-2)!important}
+td.cell.refus,.mcell.refus{outline:2px dashed var(--rouge);outline-offset:-2px}
+td.cell.origine .chip,.mcell.origine .chip{opacity:.3}
+body.glisse{user-select:none;-webkit-user-select:none;cursor:grabbing}
+.chip{cursor:grab}
+.glissemode{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:0 0 8px;
+  font-size:10.5px;color:var(--ink-2)}
+.glissemode span{width:100%}
+.gm{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:3px 9px;font-size:10.5px;flex:1}
+.gm.on{background:var(--ink);border-color:var(--ink);color:var(--card);font-weight:650}
+.railhint{font-size:10.5px;line-height:1.35;color:var(--ink-3);margin:0 0 8px}
+@media (min-width:1001px){ .chip,.fav{touch-action:none} }
+@media (max-width:1000px){ body:not(.vsem) .chip{touch-action:none} .fav{touch-action:pan-y} }
 .swatches{display:flex;flex-wrap:wrap;gap:6px}
 .swatch{width:36px;height:28px;border-radius:5px;border:1px solid var(--line-2);font-size:9px;color:var(--ink-2)}
 .swatch.on{outline:2px solid var(--ink);outline-offset:1px}
@@ -581,7 +601,7 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
-const VERSION = "v15 — 16 octobre 2026";
+const VERSION = "v16 — 2 novembre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
 const DB_ANCIENNES = ["https://towerdefense-c303b-default-rtdb.firebaseio.com",
@@ -861,6 +881,7 @@ let favMenu= LS.get("favMenu",FAV_DEF);
 let theme  = LS.get("theme","clair");
 modeMobile = LS.get("modeMobile","jour");
 let railPin = LS.get("railPin",true);
+let modeGlisse = LS.get("modeGlisse","deplacer");
 
 function mirroir(){
   LS.set("mir",{cfg:ST.cfg,employes:ST.employes,replie:ST.replie,semId:semId(lundi),sem:ST.sem});
@@ -2115,6 +2136,10 @@ function railHTML(){
       <button class="close" id="railClose">&#10005;</button></h3>
     <div class="railscroll">
       <div class="armed${arme?" on":""}" id="armedBanner"><span id="armedText">${arme?texteArme():""}</span><br><button id="disarm">Arrêter</button></div>
+      <p class="railhint">Glissez un créneau sur le planning. Un clic l'applique à plusieurs cases d'affilée.</p>
+      <div class="glissemode"><span>Créneau déjà posé, en le glissant</span>
+        <button class="gm${modeGlisse==="deplacer"?" on":""}" data-gm="deplacer">Déplacer</button>
+        <button class="gm${modeGlisse==="dupliquer"?" on":""}" data-gm="dupliquer">Dupliquer</button></div>
       <div class="absrow" id="absRow">${absHTML()}</div>
       <div class="favgrid" id="favGrid">${favHTML()}</div>
     </div>
@@ -2163,6 +2188,10 @@ function brancherRail(){
     armer(arme&&arme.kind==="abs"&&arme.type===k?null:{kind:"abs",type:k});
   });
   const g=$("[data-gomme]",r); if(g) g.onclick=()=>armer(arme&&arme.kind==="gomme"?null:{kind:"gomme"});
+  $$("[data-gm]",r).forEach(b=>b.onclick=()=>{
+    modeGlisse=b.dataset.gm; LS.set("modeGlisse",modeGlisse);
+    $$("[data-gm]",r).forEach(x=>x.classList.toggle("on",x.dataset.gm===modeGlisse));
+  });
   $("#disarm").onclick=()=>armer(null);
   $("#railClose").onclick=()=>r.classList.remove("open");
   $("#railPin").onclick=()=>{
@@ -2194,24 +2223,14 @@ function armer(a){
 $("#fabFav").onclick=()=>{const r=$("#rail"); if(r) r.classList.toggle("open")};
 
 /* ============================================================
-   20. PEINTURE DES CASES
+   20. SAISIE : PEINTURE ET GLISSER-DÉPOSER
    ============================================================ */
 let peint=false; const dejaPeint=new Set();
-const caseDe = el => (el&&el.closest) ? el.closest("td.cell,.mcell") : null;
-$("#page").addEventListener("pointerdown",ev=>{
-  const td=caseDe(ev.target); if(!td) return;
-  if(!arme){ ouvrirCreneau(td); return; }
-  ev.preventDefault(); peint=true; alertePart=false; dejaPeint.clear(); appliquer(td);
-});
-document.addEventListener("pointermove",ev=>{
-  if(!peint||!arme) return;
-  const td=caseDe(document.elementFromPoint(ev.clientX,ev.clientY));
-  if(td) appliquer(td);
-});
-const finPeinture=()=>{ if(peint){peint=false;dejaPeint.clear();rendre();} };
-document.addEventListener("pointerup",finPeinture);
-document.addEventListener("pointercancel",finPeinture);
 let alertePart=false;
+const caseDe = el => (el&&el.closest) ? el.closest("td.cell,.mcell") : null;
+const SEUIL_GLISSE=6;
+let amorce=null, glisse=null, survole=null;
+
 function appliquer(td){
   const k=td.dataset.e+"|"+td.dataset.d+"|"+td.dataset.p;
   if(dejaPeint.has(k)) return;
@@ -2231,6 +2250,166 @@ function appliquer(td){
   ecrireCreneau(td.dataset.e,td.dataset.d,td.dataset.p,val);
   td.innerHTML=chip(val,e);
 }
+
+/* ---------- description de ce que l'on déplace ---------- */
+function etiquette(g){
+  if(g.kind==="fav") return g.debut+" – "+g.fin;
+  if(g.kind==="abs") return TYPES[g.type].lab;
+  if(g.kind==="gomme") return "Effacer";
+  return g.val.type==="travail" ? g.val.debut+" – "+g.val.fin : TYPES[g.val.type].lab;
+}
+function teinte(g){
+  if(g.kind==="fav") return couleur(g.debut);
+  if(g.kind==="abs") return TYPES[g.type].bg;
+  if(g.kind==="gomme") return "transparent";
+  return g.val.type==="travail" ? (g.val.coul||couleur(g.val.debut)) : TYPES[g.val.type].bg;
+}
+const dupliquer = ev => {
+  const inv = !!(ev && (ev.ctrlKey||ev.metaKey||ev.altKey));
+  return modeGlisse==="dupliquer" ? !inv : inv;
+};
+function sourceFav(b){
+  if(b.dataset.fav){
+    const f=listeFavoris().find(x=>x.id===b.dataset.fav);
+    return f ? {kind:"fav",id:f.id,debut:f.debut,fin:f.fin,pause:f.pause} : null;
+  }
+  if(b.dataset.abs) return {kind:"abs",type:b.dataset.abs};
+  if(b.dataset.gomme) return {kind:"gomme"};
+  return null;
+}
+
+/* ---------- fantôme suivant le pointeur ---------- */
+function montrerFantome(g,x,y){
+  const f=document.createElement("div");
+  f.className="dragghost";
+  f.innerHTML=`<span class="dgp" style="background:${teinte(g)}"></span>
+    <b>${esc(etiquette(g))}</b><em></em>`;
+  document.body.appendChild(f);
+  g.ghost=f; g.lab=f.querySelector("em");
+  bougerFantome(g,x,y,null);
+}
+function bougerFantome(g,x,y,ev){
+  if(!g.ghost) return;
+  g.ghost.style.left=x+"px"; g.ghost.style.top=y+"px";
+  if(g.lab) g.lab.textContent = g.kind==="cell" ? (dupliquer(ev)?"dupliquer":"déplacer")
+                              : g.kind==="gomme" ? "vider" : "poser";
+}
+function surligner(td,ok){
+  if(survole===td){ if(td){td.classList.toggle("survol",ok);td.classList.toggle("refus",!ok);} return; }
+  if(survole) survole.classList.remove("survol","refus");
+  survole=td||null;
+  if(td){ td.classList.add(ok?"survol":"refus"); }
+}
+function compatible(g,td){
+  if(!td) return false;
+  if(g.kind==="gomme"||g.kind==="abs") return true;
+  const dep = g.kind==="fav" ? g.debut : (g.val.type==="travail"?g.val.debut:null);
+  return dep===null || partAttendue(dep)===td.dataset.p;
+}
+/* défilement automatique près des bords pendant le glissement */
+function autoDefil(x,y){
+  const z=document.querySelector(".gridwrap"); if(!z) return;
+  const r=z.getBoundingClientRect(), m=54, pas=18;
+  if(x>r.right-m) z.scrollLeft+=pas; else if(x<r.left+m) z.scrollLeft-=pas;
+  if(y>r.bottom-m) z.scrollTop+=pas; else if(y<r.top+m) z.scrollTop-=pas;
+}
+
+/* ---------- dépôt ---------- */
+function deposer(td,ev){
+  const g=glisse, e={id:td.dataset.e,...emp(td.dataset.e)}, srv=td.dataset.srv||"";
+  if(g.kind==="gomme"){ ecrireCreneau(td.dataset.e,td.dataset.d,td.dataset.p,null); return true; }
+  if(g.kind==="abs"){ ecrireCreneau(td.dataset.e,td.dataset.d,td.dataset.p,{type:g.type}); return true; }
+  if(g.kind==="fav"){
+    if(partAttendue(g.debut)!==td.dataset.p){
+      toast("Ce créneau démarre à "+g.debut+", il relève du service du "+partAttendue(g.debut)); return false; }
+    ecrireCreneau(td.dataset.e,td.dataset.d,td.dataset.p,
+      {type:"travail",debut:g.debut,fin:g.fin,pause:g.pause||0,poste:postePourService(e,srv)});
+    return true;
+  }
+  if(g.e===td.dataset.e && g.d===td.dataset.d && g.p===td.dataset.p) return false;
+  const v={...g.val};
+  if(v.type==="travail"){
+    if(partAttendue(v.debut)!==td.dataset.p){
+      toast("Ce créneau démarre à "+v.debut+", il relève du service du "+partAttendue(v.debut)); return false; }
+    if(srv && serviceDuPoste(v.poste)!==srv) v.poste=postePourService(e,srv);
+  }
+  ecrireCreneau(td.dataset.e,td.dataset.d,td.dataset.p,v);
+  if(!dupliquer(ev)) ecrireCreneau(g.e,g.d,g.p,null);
+  return true;
+}
+function finGlisse(){
+  if(glisse&&glisse.ghost) glisse.ghost.remove();
+  if(glisse&&glisse.src) glisse.src.classList.remove("origine");
+  if(survole) survole.classList.remove("survol","refus");
+  survole=null; glisse=null; amorce=null;
+  document.body.classList.remove("glisse");
+}
+
+/* ---------- événements ---------- */
+document.addEventListener("pointerdown",ev=>{
+  if(ev.button) return;
+  const b=ev.target.closest&&ev.target.closest("#rail .fav");
+  if(b){
+    if(ev.target.closest("[data-delfav]")) return;
+    if(ev.pointerType==="touch") return;            /* au doigt : le panneau reste défilable */
+    amorce={x:ev.clientX,y:ev.clientY,src:b,faire:()=>sourceFav(b)};
+    return;
+  }
+  const td=caseDe(ev.target); if(!td) return;
+  if(arme){ ev.preventDefault(); peint=true; alertePart=false; dejaPeint.clear(); appliquer(td); return; }
+  const e={id:td.dataset.e,...emp(td.dataset.e)};
+  const c=creneauSecteur(e,td.dataset.d,td.dataset.p,td.dataset.srv||"");
+  amorce={x:ev.clientX,y:ev.clientY,src:td,td,
+    faire: c ? ()=>({kind:"cell",e:td.dataset.e,d:td.dataset.d,p:td.dataset.p,val:c,src:td}) : null};
+});
+document.addEventListener("pointermove",ev=>{
+  if(peint&&arme){
+    const td=caseDe(document.elementFromPoint(ev.clientX,ev.clientY));
+    if(td) appliquer(td);
+    return;
+  }
+  if(amorce&&!glisse){
+    if(Math.abs(ev.clientX-amorce.x)<SEUIL_GLISSE && Math.abs(ev.clientY-amorce.y)<SEUIL_GLISSE) return;
+    if(!amorce.faire){ amorce=null; return; }
+    glisse=amorce.faire();
+    if(!glisse){ amorce=null; return; }
+    if(glisse.src) glisse.src.classList.add("origine");
+    document.body.classList.add("glisse");
+    montrerFantome(glisse,ev.clientX,ev.clientY);
+  }
+  if(glisse){
+    ev.preventDefault();
+    bougerFantome(glisse,ev.clientX,ev.clientY,ev);
+    autoDefil(ev.clientX,ev.clientY);
+    if(glisse.ghost) glisse.ghost.style.visibility="hidden";
+    const td=caseDe(document.elementFromPoint(ev.clientX,ev.clientY));
+    if(glisse.ghost) glisse.ghost.style.visibility="";
+    surligner(td,compatible(glisse,td));
+  }
+});
+document.addEventListener("pointerup",ev=>{
+  if(peint){ peint=false; dejaPeint.clear(); amorce=null; rendre(); return; }
+  if(glisse){
+    if(glisse.ghost) glisse.ghost.style.visibility="hidden";
+    /* au doigt, la position de relâchement est parfois inexploitable :
+       on retombe sur la dernière case survolée */
+    const td=caseDe(document.elementFromPoint(ev.clientX,ev.clientY))||survole;
+    const fait = td ? deposer(td,ev) : false;
+    finGlisse();
+    window.addEventListener("click",e=>{e.stopPropagation();e.preventDefault();},{capture:true,once:true});
+    if(fait) rendre();
+    return;
+  }
+  if(amorce&&amorce.td
+     && Math.abs(ev.clientX-amorce.x)<SEUIL_GLISSE && Math.abs(ev.clientY-amorce.y)<SEUIL_GLISSE){
+    const td=amorce.td; amorce=null; ouvrirCreneau(td); return;
+  }
+  amorce=null;
+});
+document.addEventListener("pointercancel",()=>{
+  if(peint){ peint=false; dejaPeint.clear(); rendre(); }
+  if(glisse) finGlisse(); else amorce=null;
+});
 
 /* ============================================================
    21. DIALOGUE CRÉNEAU

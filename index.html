@@ -368,6 +368,69 @@ html[data-theme=sombre] .warnbox{background:#332a1c;border-color:#4d4028;color:#
 .toast.on{opacity:1}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
+
+/* ============ espace salarié ============ */
+body.moi{display:block;overflow:auto;background:var(--paper)}
+.moi .bandeau{position:sticky;top:0;z-index:10;background:var(--chrome);color:#fff;
+  display:flex;align-items:center;gap:12px;
+  padding:calc(13px + env(safe-area-inset-top,0px)) 14px 13px}
+.moi .bandeau .qui{line-height:1.2;min-width:0;flex:1}
+.moi .bandeau .qui b{display:block;font-size:15px;font-weight:650}
+.moi .bandeau .qui span{display:block;font-size:11.5px;color:#9db0c0}
+.moi .sortie{border:1px solid #3d5468;color:#d9e4ec;border-radius:var(--r);padding:6px 11px;font-size:12.5px}
+.moi .semnav{position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:9;background:var(--card);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;padding:9px 12px}
+.moi .semnav .num{font-size:17px;font-weight:700;color:var(--accent);min-width:46px;text-align:center}
+.moi .semnav .pl{flex:1;font-size:12px;color:var(--ink-2);text-align:right}
+.moi main{padding:12px 12px calc(34px + var(--safe-b));max-width:620px;margin:0 auto}
+.moi .jour{background:var(--card);border:1px solid var(--line);border-radius:9px;margin-bottom:11px;overflow:hidden}
+.moi .jour>h3{margin:0;padding:9px 13px;font-size:13.5px;font-weight:650;background:var(--card-2);
+  border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+.moi .jour>h3 em{font-style:normal;font-weight:400;font-size:11.5px;color:var(--ink-2);margin-left:auto}
+.moi .jour.aujourdhui>h3{background:var(--accent);color:#fff}
+.moi .jour.aujourdhui>h3 em{color:#ffe3d3}
+.moi .svc{padding:11px 13px;border-bottom:1px solid var(--line)}
+.moi .svc:last-child{border-bottom:none}
+.moi .prevu{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+.moi .pastille{border-radius:4px;padding:4px 9px;font-size:13px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:#16212e;border:1px solid rgba(0,0,0,.12)}
+.moi .prevu .meta{font-size:11.5px;color:var(--ink-2)}
+.moi .prevu .note{width:100%;font-size:11.5px;color:var(--ink-2);font-style:italic}
+.moi .pointbloc{background:var(--card-2);border-radius:7px;padding:10px}
+.moi .ligne{display:grid;grid-template-columns:1fr 1fr 84px;gap:8px;align-items:end}
+.moi .ligne label{display:block;font-size:10.5px;color:var(--ink-2);font-weight:600;margin-bottom:3px}
+.moi .ligne input{width:100%;padding:9px 8px;font-size:15px;text-align:center;
+  font-variant-numeric:tabular-nums;border:1px solid var(--line-2);border-radius:5px;background:var(--card)}
+.moi .rapide{display:flex;gap:8px;margin-top:9px}
+.moi .rapide button{flex:1;padding:11px 8px;border-radius:6px;font-weight:650;font-size:13.5px;
+  border:1px solid var(--accent);background:var(--accent);color:#fff}
+.moi .rapide button.sec{background:var(--card);color:var(--accent)}
+.moi .rapide button[disabled]{opacity:.42;pointer-events:none}
+.moi .bilan{display:flex;justify-content:space-between;gap:10px;margin-top:9px;font-size:11.5px;
+  color:var(--ink-2);font-variant-numeric:tabular-nums}
+.moi .bilan b{color:var(--ink)}
+.moi .bilan b.plus{color:var(--vert)} .moi .bilan b.moins{color:var(--bleu)}
+.moi .repos{padding:13px;text-align:center;font-weight:650;color:var(--ink-2);font-size:13px}
+.moi .totaux{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:13px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;margin-bottom:11px}
+.moi .totaux div span{display:block;font-size:11px;color:var(--ink-2)}
+.moi .totaux div b{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.moi .connexion{max-width:340px;margin:min(14vh,90px) auto 0;padding:0 16px;text-align:center}
+.moi .connexion .marque{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:22px}
+.moi .connexion .marque b{font-size:17px;letter-spacing:.14em;font-weight:700}
+.moi .connexion .marque b span{font-weight:300;color:var(--accent);margin-left:.28em}
+.moi .connexion h1{font-size:16px;font-weight:650;margin:0 0 6px}
+.moi .connexion p{font-size:12.5px;color:var(--ink-2);margin:0 0 18px;line-height:1.5}
+.moi #champCode{width:100%;padding:14px;font-size:21px;text-align:center;letter-spacing:.3em;
+  text-transform:uppercase;border:1px solid var(--line-2);border-radius:7px;font-weight:700;background:var(--card)}
+.moi .connexion button{width:100%;margin-top:11px;padding:13px;font-weight:650;font-size:14px;
+  background:var(--accent);color:#fff;border:none;border-radius:7px}
+.moi .err{color:var(--rouge);font-size:12.5px;margin-top:11px;min-height:18px}
+.moi .alerte{margin-top:9px;background:#fdf6ec;border:1px solid #eddcbf;color:#6b4f1d;
+  border-radius:6px;padding:7px 9px;font-size:11.5px;line-height:1.35}
+html[data-theme=sombre] .moi .alerte{background:#332a1c;border-color:#4d4028;color:#e3cfa8}
+.moi .etatsync{font-size:11px;color:var(--ink-3);text-align:center;padding:10px 0 0}
+
 /* ============ mobile ============ */
 @media (max-width:1420px) and (min-width:1001px){
   :root{--railw:126px}
@@ -569,6 +632,12 @@ body.nopin .burger{display:block}
       <div class="field"><label for="eVisite">Visite médicale</label><input type="date" id="eVisite"></div>
     </div>
     <div class="field"><label for="eNote">Note interne</label><textarea id="eNote" rows="2"></textarea></div>
+    <div class="field"><label>Accès personnel</label>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <code id="eCode" style="font-size:15px;letter-spacing:.14em;font-weight:700"></code>
+        <button type="button" class="btn sm" id="eCodeNew">Créer un code</button>
+        <button type="button" class="btn sm" id="eCodeCopy">Copier le lien</button>
+      </div></div>
   </div>
   <div class="dlg-f">
     <button class="btn danger" id="empDelete">Retirer</button><div class="spacer"></div>
@@ -601,7 +670,7 @@ body.nopin .burger{display:block}
 /* ============================================================
    1. CONSTANTES
    ============================================================ */
-const VERSION = "v17 — 2 novembre 2026";
+const VERSION = "v18 — 5 novembre 2026";
 const LKEY = "silla-resto";
 const DEF_DB = "https://towerdefense-c303b-default-rtdb.europe-west1.firebasedatabase.app";
 const DB_ANCIENNES = ["https://towerdefense-c303b-default-rtdb.firebaseio.com",
@@ -635,6 +704,13 @@ function devinerService(nomPoste){
   if(/directeur|responsable|manager|leader|adjoint|g[ée]rant/.test(x)) return trouve("responsable")||dispo[0];
   return dispo[0];
 }
+const ALPHABET="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";   /* sans O/0 ni I/1 */
+function nouveauCode(n=8){
+  const t=new Uint32Array(n); (crypto.getRandomValues?crypto:{getRandomValues:a=>a.forEach((_,i)=>a[i]=Math.random()*4294967296)}).getRandomValues(t);
+  return [...t].map(v=>ALPHABET[v%ALPHABET.length]).join("");
+}
+const nodePerso = () => dbNode+"_perso";
+const lienSalarie = code => location.origin+location.pathname+"#/moi/"+code;
 const serviceDuPoste = pst => (ST.cfg.posteService||{})[pst] || null;
 function postePourService(e,srv){
   if(!srv || serviceDuPoste(e.poste)===srv) return e.poste||"";
@@ -715,6 +791,7 @@ const IC = {
   bed:'<path d="M3 19v-9M3 14h18v5"/><path d="M21 14v-2.5a2.5 2.5 0 0 0-2.5-2.5H10v5"/><circle cx="6.6" cy="11.4" r="1.9"/>',
   home:'<path d="M3 11l9-7.5 9 7.5"/><path d="M5.5 9.6V20h13V9.6"/><path d="M10 20v-5.5h4V20"/>',
   copie:'<rect x="9" y="8.5" width="11.5" height="11.5" rx="2"/><path d="M5.5 15.5V5.5a2 2 0 0 1 2-2h8"/>',
+  cle:'<circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3.2M15 12v2.4"/>',
   heart:'<path d="M12 20s-7.5-4.6-7.5-9.4A4.1 4.1 0 0 1 12 8.2a4.1 4.1 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z"/>'
 };
 const ico=(n,cls="ic")=>`<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]||IC.rows}</svg>`;
@@ -731,6 +808,7 @@ const MENU = [
     {id:"personnel", lab:"Le personnel", ic:"users"},
     {id:"repertoire",lab:"Répertoire",   ic:"contact"},
     {id:"suivirh",   lab:"Suivi R.H.",   ic:"rh"},
+    {id:"acces",     lab:"Accès salariés", ic:"cle"},
     {id:"compte",    lab:"Mon compte",   ic:"userC"},
     {id:"export",    lab:"Export",       ic:"dl"}]},
   {t:"Plannings", items:[
@@ -858,7 +936,7 @@ let ST = {
   cfg:{ resto:{nom:"Mon restaurant",ville:"",adresse:"",lat:48.638,lon:4.949},
         services:[...SERVICES_DEF], postes:[...POSTES_DEF], posteService:{}, favoris:favDefaut() },
   employes:{}, sem:{}, reel:{}, validations:{}, traces:{},
-  cache:{}, replie:{}
+  cache:{}, replie:{}, point:{}
 };
 let lundi = lundiDe(new Date());
 let jourActif = (new Date().getDay()||7)-1;
@@ -963,7 +1041,7 @@ async function initFirebase(){
                      posteService:v.posteService||ST.cfg.posteService||{}, favoris:v.favoris||{} };
       mirroir(); majEntete(); rendre();
     },()=>{ majSync("off","Accès refusé"); toast("Firebase refuse la lecture du nœud « "+dbNode+" »"); });
-    FB.onValue(FB.ref(FB.db,dbNode+"/employes"),s=>{ ST.employes=s.val()||{}; mirroir(); rendre(); });
+    FB.onValue(FB.ref(FB.db,dbNode+"/employes"),s=>{ ST.employes=s.val()||{}; mirroir(); abonnerPointages(); rendre(); });
     FB.onValue(FB.ref(FB.db,dbNode+"/validations"),s=>{ ST.validations=s.val()||{}; rendre(); });
     FB.onValue(FB.ref(FB.db,dbNode+"/traces"),s=>{ ST.traces=s.val()||{}; if(vue==="traces")rendre(); });
     abonnerSemaine();
@@ -977,28 +1055,72 @@ function abonnerSemaine(){
     ST.sem=s.val()||{}; ST.cache[sid]=ST.sem; mirroir(); rendre(); });
   unsubReel = FB.onValue(FB.ref(FB.db,dbNode+"/reel/"+sid),s=>{
     ST.reel=s.val()||{}; if(vue==="em-jour"||vue==="em-hebdo")rendre(); });
+  ST.point={}; abonnerPointages();
 }
 function ecrireCfg(){ mirroir(); if(FB) ecrire(dbNode+"/config",ST.cfg); }
 function ecrireEmploye(id,val){
   mirroir();
   if(FB) ecrire(dbNode+"/employes/"+id, val||null);
+  if(val&&val.code) planifierPublication(id,semId(lundi));
 }
 function ecrireCreneau(emp,date,part,val){
   if(val){ (ST.sem[emp]||={}); (ST.sem[emp][date]||={}); ST.sem[emp][date][part]=val; }
   else if(ST.sem[emp]&&ST.sem[emp][date]) delete ST.sem[emp][date][part];
   mirroir();
   if(FB) ecrire(dbNode+"/semaines/"+semId(dateDe(date))+"/"+emp+"/"+date+"/"+part, val||null);
+  planifierPublication(emp,semId(dateDe(date)));
 }
 function ecrireReel(emp,date,part,val){
   if(val){ (ST.reel[emp]||={}); (ST.reel[emp][date]||={}); ST.reel[emp][date][part]=val; }
   else if(ST.reel[emp]&&ST.reel[emp][date]) delete ST.reel[emp][date][part];
   if(FB) ecrire(dbNode+"/reel/"+semId(dateDe(date))+"/"+emp+"/"+date+"/"+part, val||null);
 }
+/* --- publication de la semaine d'un salarié dans son espace privé --- */
+function publierSalarie(id,sid){
+  const e=ST.employes[id];
+  if(!FB||!e||!e.code) return;
+  const base=nodePerso()+"/"+e.code;
+  FB.set(FB.ref(FB.db,base+"/info"),{prenom:e.prenom||"",nom:e.nom||"",poste:e.poste||"",
+    service:e.service||"",contrat:e.contrat||0,etab:(ST.cfg.resto||{}).nom||"",maj:Date.now()}).catch(()=>{});
+  const src=((sid===semId(lundi)?ST.sem:(ST.cache[sid]||{}))[id])||{};
+  const net={};
+  for(const d of Object.keys(src)) if(src[d]&&Object.keys(src[d]).length) net[d]=src[d];
+  FB.set(FB.ref(FB.db,base+"/sem/"+sid), Object.keys(net).length?net:null).catch(()=>{});
+}
+const enAttente=new Map(); let tPublie;
+function planifierPublication(id,sid){
+  if(!FB||!ST.employes[id]||!ST.employes[id].code) return;
+  enAttente.set(id+"|"+sid,[id,sid]);
+  clearTimeout(tPublie);
+  tPublie=setTimeout(()=>{ for(const [i,x] of enAttente.values()) publierSalarie(i,x); enAttente.clear(); },1000);
+}
+function publierTout(sid){
+  let n=0;
+  for(const e of listeEmployes()) if(e.code){ publierSalarie(e.id,sid); n++; }
+  return n;
+}
+/* --- pointages déclarés par les salariés --- */
+let unsubPoint=[];
+function abonnerPointages(){
+  if(!FB) return;
+  unsubPoint.forEach(u=>{try{u()}catch(x){}}); unsubPoint=[];
+  const sid=semId(lundi);
+  for(const e of listeEmployes()){
+    if(!e.code) continue;
+    unsubPoint.push(FB.onValue(FB.ref(FB.db,nodePerso()+"/"+e.code+"/point/"+sid),s=>{
+      ST.point[e.id]=s.val()||{};
+      if(["em-jour","em-hebdo","acces","paye"].includes(vue)) rendre();
+    },()=>{}));
+  }
+}
+const lirePoint=(e,d,p)=>(ST.point&&ST.point[e]&&ST.point[e][d]&&ST.point[e][d][p])||null;
+
 function ecrireLot(sid,patch){
   mirroir();
   if(!FB) return;
   cheminEnCours=dbNode+"/semaines/"+sid+" (lot)";
   FB.update(FB.ref(FB.db,dbNode+"/semaines/"+sid),patch).catch(erreurEcriture);
+  new Set(Object.keys(patch).map(k=>k.split("/")[0])).forEach(id=>planifierPublication(id,sid));
 }
 function tracer(quoi){
   const t={ts:Date.now(),qui:user.nom,role:user.role,quoi};
@@ -1009,6 +1131,7 @@ function valider(sid,on){
   const v=on?{par:user.nom,ts:Date.now()}:null;
   if(on) ST.validations[sid]=v; else delete ST.validations[sid];
   if(FB) ecrire(dbNode+"/validations/"+sid, on?v:null);
+  if(on){ const n=publierTout(sid); if(n) toast("Semaine validée et publiée pour "+n+" salarié"+(n>1?"s":"")); }
   tracer((on?"Validation":"Dévalidation")+" de la semaine "+sid);
 }
 async function chargerSemaines(ids){
@@ -1625,6 +1748,67 @@ VUES.repertoire = ()=>{
   dessine("");
   $("#qRep").addEventListener("input",e=>dessine(e.target.value));
 };
+VUES.acces = ()=>{
+  bar(`<span class="vtitle">Accès salariés</span><div class="spacer"></div>
+    <button class="btn sm" id="btnPubTout">Publier la semaine ${semId(lundi)}</button>
+    <button class="btn sm primary" id="btnCodesTous">Générer les codes manquants</button>`);
+  const L=listeEmployes(), sid=semId(lundi);
+  let h=`<p class="warnbox" style="max-width:860px">Chaque salarié consulte son seul planning et déclare ses heures
+    avec son code, depuis son téléphone. Transmettez-lui le lien : le code y est déjà inscrit.
+    Ce cloisonnement empêche un salarié de consulter les heures d'un collègue depuis l'application ;
+    il ne remplace pas une authentification, que je peux ajouter si vous le souhaitez.</p>
+    <div class="card tbwrap"><table class="tb"><thead><tr>
+    <th>Salarié</th><th>Code</th><th>Lien à envoyer</th><th class="num">Pointages de la semaine</th><th></th>
+    </tr></thead><tbody>`;
+  h+= L.length ? L.map(e=>{
+    const pts=Object.values((ST.point||{})[e.id]||{}).reduce((n,j)=>n+Object.keys(j||{}).length,0);
+    return `<tr><td><div class="person">
+      <span class="avatar" style="background:${avCol(e.id)}">${esc(initiales(e))}</span>
+      <span class="pinfo"><b>${esc(nomComplet(e))}</b><span>${esc(e.poste||"")}</span></span></div></td>
+      <td><code style="font-size:15px;letter-spacing:.14em;font-weight:700">${e.code?esc(e.code):'<span class="muted" style="font-weight:400;letter-spacing:0;font-size:12px">aucun</span>'}</code></td>
+      <td>${e.code?`<button class="btn sm" data-lien="${esc(e.code)}">Copier le lien</button>
+        <button class="btn sm" data-sms="${esc(e.id)}">Envoyer par SMS</button>`:""}</td>
+      <td class="num">${pts||"—"}</td>
+      <td><button class="btn sm" data-code="${e.id}">${e.code?"Changer":"Créer"}</button>
+        ${e.code?`<button class="btn sm danger" data-nocode="${e.id}">Retirer</button>`:""}</td></tr>`;
+    }).join("")
+  : `<tr><td colspan="5" class="muted" style="padding:20px">Aucun salarié enregistré.</td></tr>`;
+  page(wrapPad(h+`</tbody></table></div>`));
+
+  $$("#page [data-code]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.code, e={...emp(id)};
+    if(e.code&&!confirm("Changer le code de "+nomComplet(e)+" ? L'ancien lien cessera de fonctionner.")) return;
+    e.code=nouveauCode(); ST.employes[id]=e; ecrireEmploye(id,e);
+    publierSalarie(id,sid); tracer("Code d'accès créé pour "+nomComplet(e));
+    rendre(); toast("Code "+e.code);
+  });
+  $$("#page [data-nocode]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.nocode, e={...emp(id)}, anc=e.code;
+    if(!confirm("Retirer l'accès de "+nomComplet(e)+" ?")) return;
+    delete e.code; ST.employes[id]=e; ecrireEmploye(id,e);
+    if(FB&&anc) FB.remove(FB.ref(FB.db,nodePerso()+"/"+anc)).catch(()=>{});
+    tracer("Accès retiré pour "+nomComplet(e)); rendre();
+  });
+  $$("#page [data-lien]").forEach(b=>b.onclick=async()=>{
+    const l=lienSalarie(b.dataset.lien);
+    try{ await navigator.clipboard.writeText(l); toast("Lien copié"); }
+    catch(e){ infoDlg("Lien d'accès",`<input type="text" value="${esc(l)}" readonly onclick="this.select()">`); }
+  });
+  $$("#page [data-sms]").forEach(b=>b.onclick=()=>{
+    const e=emp(b.dataset.sms);
+    const txt="Bonjour "+(e.prenom||"")+", voici l'accès à ton planning et à ton pointage : "+lienSalarie(e.code)
+      +" (code "+e.code+")";
+    location.href="sms:"+(e.tel||"")+"?&body="+encodeURIComponent(txt);
+  });
+  $("#btnCodesTous").onclick=()=>{
+    let n=0;
+    for(const e of listeEmployes()) if(!e.code){
+      const v={...emp(e.id),code:nouveauCode()}; ST.employes[e.id]=v; ecrireEmploye(e.id,v); publierSalarie(e.id,sid); n++;
+    }
+    tracer(n+" codes d'accès créés"); rendre(); toast(n?n+" code(s) créé(s)":"Tout le monde a déjà un code");
+  };
+  $("#btnPubTout").onclick=()=>{ const n=publierTout(sid); toast(n?"Publié pour "+n+" salarié(s)":"Aucun salarié n'a de code"); };
+};
 VUES.suivirh = ()=>{
   bar(`<span class="vtitle">Suivi R.H.</span><div class="spacer"></div>
     <span class="muted">Échéances des 90 prochains jours</span>`);
@@ -1653,9 +1837,10 @@ VUES.suivirh = ()=>{
    14. ÉMARGEMENT
    ============================================================ */
 function ligneEmargement(e,dd,p){
-  const prev=lireCreneau(e.id,dd,p.id), r=lireReel(e.id,dd,p.id);
+  const prev=lireCreneau(e.id,dd,p.id), r=lireReel(e.id,dd,p.id), dec=lirePoint(e.id,dd,p.id);
   if(!prev||prev.type!=="travail") return "";
-  const rd=r?r.debut:prev.debut, rf=r?r.fin:prev.fin, rp=r?r.pause:(prev.pause||0);
+  const src=r||dec;
+  const rd=src?src.debut:prev.debut, rf=src?src.fin:prev.fin, rp=src?(src.pause??0):(prev.pause||0);
   const dp=duree(prev), dr=duree({type:"travail",debut:rd,fin:rf,pause:rp});
   const ec=dr-dp;
   return `<tr data-row="${e.id}|${dd}|${p.id}">
@@ -1668,7 +1853,9 @@ function ligneEmargement(e,dd,p){
     <td><input type="number" data-f="pause" value="${rp}" min="0" max="240" step="5" style="width:70px"></td>
     <td class="num">${fmt(dr)}</td>
     <td class="num" style="color:${ec>0?"var(--rouge)":ec<0?"var(--bleu)":"var(--ink-2)"}">${ec?(ec>0?"+":"")+fmt(ec):"—"}</td>
-    <td>${r?'<span style="color:var(--vert)">saisi</span>':'<span class="muted">prévu</span>'}</td></tr>`;
+    <td>${r?'<span style="color:var(--vert)">validé</span>'
+          :dec?'<span style="color:var(--accent);font-weight:600">déclaré</span>'
+          :'<span class="muted">prévu</span>'}</td></tr>`;
 }
 function brancherEmargement(){
   $$("#page tr[data-row]").forEach(tr=>{
@@ -1681,7 +1868,9 @@ function brancherEmargement(){
   });
 }
 VUES["em-jour"] = ()=>{
-  bar(barSemaine()+barJours()+`<button class="btn sm" id="btnCopyPrev">Reporter le prévu sur le réalisé</button>`);
+  bar(barSemaine()+barJours()
+    +`<button class="btn sm primary" id="btnPrendreDecl">Valider les pointages déclarés</button>`
+    +`<button class="btn sm" id="btnCopyPrev">Reporter le prévu sur le réalisé</button>`);
   const js=jours(), dd=ymd(js[jourActif]);
   let lignes="";
   for(const e of listeEmployes()) for(const p of PARTS) lignes+=ligneEmargement(e,dd,p);
@@ -1700,6 +1889,17 @@ VUES["em-jour"] = ()=>{
       }
     }
     tracer("Émargement du "+dd+" prérempli ("+n+" lignes)"); rendre(); toast(n+" lignes préremplies");
+  };
+  $("#btnPrendreDecl").onclick=()=>{
+    let n=0;
+    for(const e of listeEmployes()) for(const p of PARTS){
+      const d=lirePoint(e.id,dd,p.id);
+      if(d&&d.debut&&d.fin&&!lireReel(e.id,dd,p.id)){
+        ecrireReel(e.id,dd,p.id,{debut:d.debut,fin:d.fin,pause:d.pause||0,par:user.nom}); n++;
+      }
+    }
+    tracer(n+" pointages déclarés validés le "+dd); rendre();
+    toast(n?n+" pointage(s) validé(s)":"Aucun pointage déclaré à valider");
   };
 };
 VUES["em-hebdo"] = ()=>{
@@ -2069,8 +2269,8 @@ VUES.paye = ()=>{
     for(const d of jours()) for(const p of PARTS){
       const c=lireCreneau(e.id,ymd(d),p.id); if(!c||c.type!=="travail") continue;
       prev+=duree(c);
-      const r=lireReel(e.id,ymd(d),p.id);
-      reel+=r?duree({type:"travail",...r}):duree(c);
+      const r=lireReel(e.id,ymd(d),p.id)||lirePoint(e.id,ymd(d),p.id);
+      reel+=(r&&r.debut&&r.fin)?duree({type:"travail",...r}):duree(c);
     }
     return {e,prev,reel};
   });
@@ -2466,7 +2666,13 @@ $("#shCancel").onclick=()=>$("#dlgShift").close();
 /* ============================================================
    22. FICHE SALARIÉ
    ============================================================ */
-let empEdit=null;
+let empEdit=null, codeEdit="";
+function majCodeFiche(){
+  $("#eCode").textContent=codeEdit||"aucun";
+  $("#eCodeCopy").style.display=codeEdit?"":"none";
+  $("#eCodeNew").textContent=codeEdit?"Changer le code":"Créer un code";
+}
+
 function ouvrirEmp(id){
   empEdit=id;
   const e=id?emp(id):{poste:ST.cfg.postes[0],service:ST.cfg.services[0],contrat:2100,type:"CDI"};
@@ -2481,6 +2687,8 @@ function ouvrirEmp(id){
   $("#eNaiss").value=e.naissance||""; $("#eEmb").value=e.embauche||"";
   $("#eEssai").value=e.finEssai||""; $("#eFin").value=e.finContrat||""; $("#eVisite").value=e.visite||"";
   $("#eNote").value=e.note||"";
+  codeEdit=e.code||"";
+  majCodeFiche();
   $("#empDelete").style.display=id?"":"none";
   $("#dlgEmp").showModal();
 }
@@ -2497,7 +2705,7 @@ $("#empSave").onclick=()=>{
     tel:$("#eTel").value.trim(), email:$("#eMail").value.trim(),
     naissance:$("#eNaiss").value, embauche:$("#eEmb").value,
     finEssai:$("#eEssai").value, finContrat:$("#eFin").value, visite:$("#eVisite").value,
-    note:$("#eNote").value.trim()
+    note:$("#eNote").value.trim(), code:codeEdit
   };
   Object.keys(e).forEach(k=>{ if(e[k]==="") delete e[k]; });
   if(!e.nom) return toast("Le nom est obligatoire");
@@ -2512,6 +2720,14 @@ $("#empDelete").onclick=()=>{
   delete ST.employes[empEdit]; ecrireEmploye(empEdit,null);
   tracer("Retrait du salarié "+nomComplet(e));
   $("#dlgEmp").close(); rendre();
+};
+$("#eCodeNew").onclick=()=>{
+  if(codeEdit&&!confirm("Changer le code ? L'ancien lien cessera de fonctionner.")) return;
+  codeEdit=nouveauCode(); majCodeFiche(); toast("Code "+codeEdit+" — enregistrez la fiche");
+};
+$("#eCodeCopy").onclick=async()=>{
+  try{ await navigator.clipboard.writeText(lienSalarie(codeEdit)); toast("Lien copié"); }
+  catch(e){ toast(lienSalarie(codeEdit)); }
 };
 $("#empCancel").onclick=()=>$("#dlgEmp").close();
 VUES.compte = ()=>{ ouvrirCompte(); aller("accueil"); };
@@ -2627,10 +2843,227 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Escape"&&arme&&!document.querySelector("dialog[open]")) armer(null);
 });
 
+
+/* ============================================================
+   25. ESPACE SALARIÉ
+   ============================================================ */
+const SEUIL_MOI = 16*60+30;
+let codeMoi=LS.get("moncode",""), fbMoi=null, infoMoi=null;
+let semMoi={}, pointMoi={}, lundiMoi=lundiDe(new Date());
+let uSemMoi=null, uPtMoi=null, uInfoMoi=null;
+
+function ecranConnexion(msg){
+  document.body.innerHTML=`<div class="connexion">
+    <div class="marque">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M12.5 8V3M27.5 8V3" stroke="#2f6f9f" stroke-width="3.4" stroke-linecap="round"/>
+        <rect x="3" y="6" width="34" height="31" rx="7" fill="#e8763f"/>
+        <path d="M13 20v12M13 26l6.5-6M13 26l7 6" stroke="#fff" stroke-width="2.9"
+              stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b>KIK<span>PLANIF'</span></b></div>
+    <h1>Mon planning</h1>
+    <p>Saisissez le code à huit caractères que votre responsable vous a transmis.</p>
+    <input type="text" id="champCode" maxlength="8" autocapitalize="characters"
+      autocomplete="off" spellcheck="false" inputmode="text" aria-label="Code d'accès">
+    <button id="btnEntrer">Voir mon planning</button>
+    <div class="err" id="errCode">${esc(msg||"")}</div></div>`;
+  const ch=$("#champCode");
+  ch.addEventListener("input",()=>{ ch.value=ch.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,8); });
+  ch.addEventListener("keydown",e=>{ if(e.key==="Enter") $("#btnEntrer").click(); });
+  $("#btnEntrer").onclick=async()=>{
+    const c=ch.value.trim();
+    if(c.length<4) return $("#errCode").textContent="Code incomplet.";
+    $("#btnEntrer").textContent="Vérification…"; $("#errCode").textContent="";
+    const ok=await verifierCode(c);
+    if(ok){ codeMoi=c; LS.set("moncode",c); LS.set("verrouSalarie",true); demarrerMoi(); }
+    else { $("#btnEntrer").textContent="Voir mon planning";
+           $("#errCode").textContent="Code inconnu, ou connexion indisponible."; }
+  };
+  setTimeout(()=>ch.focus(),120);
+}
+async function connecterMoi(){
+  if(fbMoi) return fbMoi;
+  if(!dbUrl) return null;
+  try{
+    const [A,D]=await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js")]);
+    fbMoi={db:D.getDatabase(A.initializeApp({databaseURL:dbUrl},"moi"+Date.now())), ...D};
+    return fbMoi;
+  }catch(e){ return null; }
+}
+async function verifierCode(c){
+  const f=await connecterMoi(); if(!f) return false;
+  try{ return (await f.get(f.ref(f.db,nodePerso()+"/"+c+"/info"))).exists(); }
+  catch(e){ return false; }
+}
+const cleMoi = sid => "moi:"+codeMoi+":"+sid;
+function joursMoi(){ return Array.from({length:7},(_,i)=>{const d=new Date(lundiMoi);d.setDate(d.getDate()+i);return d}); }
+const creneauMoi=(d,p)=>(semMoi[d]&&semMoi[d][p])||null;
+const pointageMoi=(d,p)=>(pointMoi[d]&&pointMoi[d][p])||null;
+
+async function demarrerMoi(){
+  document.body.innerHTML=`<div class="etatsync" style="padding:40px 0">Chargement…</div>`;
+  const sid=semId(lundiMoi);
+  const cache=LS.get(cleMoi(sid),null);
+  if(cache){ semMoi=cache.sem||{}; pointMoi=cache.point||{}; }
+  infoMoi=infoMoi||LS.get("moi:info:"+codeMoi,null);
+  dessinerMoi();
+  const f=await connecterMoi();
+  if(!f){ majEtatMoi("Hors ligne, dernières données enregistrées sur ce téléphone"); return; }
+  [uInfoMoi,uSemMoi,uPtMoi].forEach(u=>{ if(u){try{u()}catch(e){}} });
+  const base=nodePerso()+"/"+codeMoi;
+  uInfoMoi=f.onValue(f.ref(f.db,base+"/info"),s=>{
+    infoMoi=s.val(); LS.set("moi:info:"+codeMoi,infoMoi); dessinerMoi(); },
+    ()=>majEtatMoi("Accès refusé, demandez un nouveau code"));
+  uSemMoi=f.onValue(f.ref(f.db,base+"/sem/"+sid),s=>{ semMoi=s.val()||{}; sauverMoi(sid); dessinerMoi(); });
+  uPtMoi =f.onValue(f.ref(f.db,base+"/point/"+sid),s=>{ pointMoi=s.val()||{}; sauverMoi(sid); dessinerMoi(); });
+}
+const sauverMoi = sid => LS.set(cleMoi(sid),{sem:semMoi,point:pointMoi});
+function majEtatMoi(t){ const e=$("#etatMoi"); if(e) e.textContent=t; }
+
+function allerSemMoi(d){
+  lundiMoi.setDate(lundiMoi.getDate()+d*7);
+  semMoi={}; pointMoi={}; demarrerMoi();
+}
+function maintenantHM(){ const n=new Date(); return pad(n.getHours())+":"+pad(n.getMinutes()); }
+
+async function ecrirePointage(dd,part,v){
+  const sid=semId(dateDe(dd));
+  if(v){ (pointMoi[dd]||={}); pointMoi[dd][part]=v; }
+  else if(pointMoi[dd]) delete pointMoi[dd][part];
+  sauverMoi(sid); dessinerMoi();
+  const f=await connecterMoi(); if(!f) return;
+  const r=f.ref(f.db,nodePerso()+"/"+codeMoi+"/point/"+sid+"/"+dd+"/"+part);
+  try{ await (v?f.set(r,v):f.remove(r)); }
+  catch(e){ majEtatMoi("Enregistrement impossible, réessayez quand le réseau revient"); }
+}
+
+function dessinerMoi(){
+  const js=joursMoi(), today=ymd(new Date());
+  const nom=infoMoi?((infoMoi.prenom||"")+" "+(infoMoi.nom||"")).trim():"Mon planning";
+  let prevuTot=0, pointeTot=0;
+  let corps="";
+  for(const d of js){
+    const dd=ymd(d);
+    let blocs="";
+    for(const part of ["midi","soir"]){
+      const c=creneauMoi(dd,part), pt=pointageMoi(dd,part);
+      if(!c && !pt) continue;
+      if(c && c.type!=="travail"){
+        blocs+=`<div class="svc"><div class="repos" style="background:${TYPES[c.type].bg};color:${TYPES[c.type].fg};border-radius:6px">
+          ${esc(TYPES[c.type].lab)}${c.note?" — "+esc(c.note):""}</div></div>`;
+        continue;
+      }
+      const dp=c?duree(c):0; prevuTot+=dp;
+      const dr=pt?duree({type:"travail",debut:pt.debut,fin:pt.fin,pause:pt.pause||0}):0;
+      if(pt&&pt.debut&&pt.fin) pointeTot+=dr;
+      const ec=(pt&&pt.debut&&pt.fin&&c)?dr-dp:null;
+      const dj=joursEntre(dd,ymd(new Date()));   /* 0 aujourd'hui, 1 hier */
+      const horodatable = dj>=0 && dj<=1;
+      const suspect = pt&&pt.debut&&pt.fin&&c&&Math.abs(dr-dp)>180;
+      blocs+=`<div class="svc">
+        <div class="prevu">
+          <span class="pastille" style="background:${c?(c.coul||couleur(c.debut)):"#e2e8ed"}">
+            ${c?c.debut+" – "+c.fin:"hors planning"}</span>
+          <span class="meta">${part==="midi"?"Midi":"Soir"}${c&&c.poste?" · "+esc(c.poste):""}${c?" · pause "+(c.pause||0)+" min · "+fmt(dp)+" prévues":""}</span>
+          ${c&&c.note?`<span class="note">${esc(c.note)}</span>`:""}
+        </div>
+        <div class="pointbloc">
+          <div class="ligne">
+            <div><label>Arrivée</label><input type="time" data-pt="${dd}|${part}|debut" value="${pt?pt.debut||"":""}"></div>
+            <div><label>Départ</label><input type="time" data-pt="${dd}|${part}|fin" value="${pt?pt.fin||"":""}"></div>
+            <div><label>Pause</label><input type="number" min="0" max="240" step="5"
+                 data-pt="${dd}|${part}|pause" value="${pt?(pt.pause??(c?c.pause||0:0)):(c?c.pause||0:0)}"></div>
+          </div>
+          ${horodatable?`<div class="rapide">
+            <button data-top="${dd}|${part}|debut"${pt&&pt.debut?" disabled":""}>Je prends mon service</button>
+            <button class="sec" data-top="${dd}|${part}|fin"${!(pt&&pt.debut)||(pt&&pt.fin)?" disabled":""}>Je termine</button>
+          </div>`:""}
+          ${suspect?`<div class="alerte">Écart important avec le prévu, vérifiez les heures saisies.</div>`:""}
+          <div class="bilan">
+            <span>${pt&&pt.debut&&pt.fin?"Pointé <b>"+fmt(dr)+"</b>":"Pas encore pointé"}</span>
+            ${ec!==null?`<span>Écart <b class="${ec>0?"plus":ec<0?"moins":""}">${ec>0?"+":""}${fmt(ec)}</b></span>`:""}
+            ${pt?`<button class="linkbtn" data-eff="${dd}|${part}">Effacer</button>`:""}
+          </div>
+        </div></div>`;
+    }
+    if(!blocs) blocs=`<div class="svc"><div class="repos" style="color:var(--ink-3);font-weight:500">Aucun service prévu</div></div>`;
+    corps+=`<section class="jour${dd===today?" aujourdhui":""}">
+      <h3>${JOURS_L[(d.getDay()||7)-1]} ${d.getDate()} ${MOIS[d.getMonth()]}<em>${dd===today?"aujourd'hui":""}</em></h3>
+      ${blocs}</section>`;
+  }
+  const ecTot=pointeTot-prevuTot;
+  document.body.className="moi";
+  document.body.innerHTML=`
+    <div class="bandeau">
+      <div class="qui"><b>${esc(nom)}</b>
+        <span>${infoMoi?esc([infoMoi.poste,infoMoi.etab].filter(Boolean).join(" · ")):""}</span></div>
+      <button class="sortie" id="btnSortirMoi">Quitter</button>
+    </div>
+    <div class="semnav">
+      <button class="nav" data-sm="-1" aria-label="Semaine précédente">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <span class="num tnum">S${isoSem(lundiMoi).num}</span>
+      <button class="nav" data-sm="1" aria-label="Semaine suivante">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button class="btn sm" data-sm="0">Cette semaine</button>
+      <span class="pl">${js[0].toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"})} au ${js[6].toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"})}</span>
+    </div>
+    <main>
+      <div class="totaux">
+        <div><span>Prévu</span><b>${fmt(prevuTot)}</b></div>
+        <div><span>Pointé</span><b>${fmt(pointeTot)}</b></div>
+        <div><span>Écart</span><b class="${ecTot>0?"plus":ecTot<0?"moins":""}">${ecTot>0?"+":""}${fmt(ecTot)}</b></div>
+      </div>
+      ${corps}
+      <div class="etatsync" id="etatMoi"></div>
+    </main>`;
+  brancherMoi();
+}
+function brancherMoi(){
+  $$("[data-sm]").forEach(b=>b.onclick=()=>{
+    const d=+b.dataset.sm;
+    if(d===0) lundiMoi=lundiDe(new Date()); else lundiMoi.setDate(lundiMoi.getDate()+d*7);
+    semMoi={}; pointMoi={}; demarrerMoi();
+  });
+  $$("[data-pt]").forEach(i=>i.onchange=()=>{
+    const [dd,part,champ]=i.dataset.pt.split("|");
+    const a=pointageMoi(dd,part)||{}, c=creneauMoi(dd,part);
+    const v={debut:a.debut||"",fin:a.fin||"",pause:a.pause??(c&&c.type==="travail"?c.pause||0:0)};
+    v[champ]= champ==="pause" ? (+i.value||0) : i.value;
+    if(!v.debut&&!v.fin) return ecrirePointage(dd,part,null);
+    v.ts=Date.now(); ecrirePointage(dd,part,v);
+  });
+  $$("[data-top]").forEach(b=>b.onclick=()=>{
+    const [dd,part,champ]=b.dataset.top.split("|");
+    const a=pointageMoi(dd,part)||{};
+    const c=creneauMoi(dd,part);
+    const v={debut:a.debut||"",fin:a.fin||"",pause:a.pause??(c?c.pause||0:0),ts:Date.now()};
+    v[champ]=maintenantHM();
+    ecrirePointage(dd,part,v);
+  });
+  $$("[data-eff]").forEach(b=>b.onclick=()=>{
+    const [dd,part]=b.dataset.eff.split("|");
+    if(confirm("Effacer ce pointage ?")) ecrirePointage(dd,part,null);
+  });
+  $("#btnSortirMoi").onclick=()=>{
+    if(!confirm("Quitter votre espace sur cet appareil ? Le code sera redemandé.")) return;
+    LS.set("verrouSalarie",false); LS.set("moncode","");
+    location.hash=""; location.reload();
+  };
+}
+
 /* ============================================================
    24. DÉMARRAGE
    ============================================================ */
 document.documentElement.dataset.theme=theme;
+const mMoi=(location.hash||"").match(/^#\/moi(?:\/([A-Za-z0-9]{4,12}))?/i);
+if(mMoi || LS.get("verrouSalarie",false)){
+  if(mMoi && mMoi[1]){ codeMoi=mMoi[1].toUpperCase(); LS.set("moncode",codeMoi); LS.set("verrouSalarie",true); }
+  history.replaceState(null,"",location.pathname+"#/moi");
+  if(codeMoi) demarrerMoi(); else ecranConnexion();
+} else {
 $("#vTag").textContent=VERSION.split(" ")[0];
 chargerMirroir();
 const dep=(location.hash||"").replace("#/","");
@@ -2639,6 +3072,7 @@ rendreMenu();
 rendre();
 initFirebase();
 chargerMeteo().then(()=>{ if(vue==="accueil") rendre(); });
+}
 </script>
 </body>
 </html>
